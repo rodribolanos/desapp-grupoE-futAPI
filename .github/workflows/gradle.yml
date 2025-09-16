@@ -15,6 +15,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    # Gradlew permissiones
+    - name: Give gradlew permissions
+      run: chmod +x ./gradlew
+
     - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
