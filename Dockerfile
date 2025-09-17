@@ -7,6 +7,9 @@ WORKDIR /app
 # Copy all the code to the container
 COPY . .
 
+# ✅ Give execute permissions to the Gradle wrapper
+RUN chmod +x ./gradlew
+
 # Compilamos el jar (sin correr tests para que sea más rápido en despliegue)
 RUN ./gradlew clean build -x test
 
