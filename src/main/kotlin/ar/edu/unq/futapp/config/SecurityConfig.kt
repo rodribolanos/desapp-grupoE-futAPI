@@ -22,7 +22,11 @@ class SecurityConfig() {
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/auth/**").permitAll()
+                    .requestMatchers(
+                        "/auth/**",
+                        "/swagger-ui/**",
+                        "/api-docs/**",
+                        "/swagger-ui.html").permitAll()
                     .anyRequest().authenticated()
             }
             .exceptionHandling { it.authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)) }
