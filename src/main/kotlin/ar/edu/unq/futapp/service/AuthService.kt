@@ -31,14 +31,10 @@ class AuthService(
     }
 
     fun register(request: AuthRequestDTO): AuthResponseDTO {
-        val registrado = userService.register(request.username, request.password)
-        if (registrado) {
-            val accessToken = jwtUtil.generateToken(request.username)
-            val refreshToken = jwtUtil.generateToken(request.username, isRefresh = true)
-            return AuthResponseDTO(accessToken, refreshToken)
-        } else {
-            throw UserAlreadyExistsException("El usuario ya existe")
-        }
+        val registeredSuccessfully = userService.register(request.username, request.password)
+        val accessToken = jwtUtil.generateToken(request.username)
+        val refreshToken = jwtUtil.generateToken(request.username, isRefresh = true)
+        return AuthResponseDTO(accessToken, refreshToken)
     }
 
     fun refresh(request: RefreshRequestDTO): AuthResponseDTO {

@@ -1,40 +1,33 @@
 package ar.edu.unq.futapp.model
 
+import ar.edu.unq.futapp.exception.InvalidPasswordException
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.validation.constraints.Size
-import lombok.NoArgsConstructor
 
 @Entity(name = "users")
-@NoArgsConstructor
 class User {
     @Id
     @Column(nullable = false, unique = true)
-    private var username: String
+    lateinit var username: String
 
     @Column(nullable = false)
     @field:Size(min = 8, message = "Password must be at least 8 characters long")
-    private var password: String
+    lateinit var password: String
+
+    constructor()
 
     constructor(username: String, password: String) {
         this.username = username
-        require(isValidPassword(password)) {
-            "La contraseña debe tener al menos 8 caracteres, un número, un caracter especial, una mayúscula y una minúscula."
-        }
+        // Acepta contraseñas en texto plano o encriptadas; la validación ocurre en el servicio
         this.password = password
     }
 
     fun username(): String = username
     fun password(): String = password
     fun password(newPassword: String) {
-        require(isValidPassword(newPassword)) {
-            "La contraseña debe tener al menos 8 caracteres, un número, un caracter especial, una mayúscula y una minúscula."
-        }
-    }
-
-    private fun isValidPassword(password: String): Boolean {
-        val regex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}")
-        return regex.matches(password)
+        // Setter simple; el servicio debe asegurarse de validar/encodear antes de setear
+        this.password = newPassword
     }
 }

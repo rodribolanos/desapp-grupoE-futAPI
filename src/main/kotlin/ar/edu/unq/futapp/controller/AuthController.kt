@@ -5,6 +5,8 @@ import ar.edu.unq.futapp.dto.AuthResponseDTO
 import ar.edu.unq.futapp.dto.RefreshRequestDTO
 import ar.edu.unq.futapp.service.AuthService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -19,7 +21,7 @@ class AuthController @Autowired constructor(
 
     @PostMapping("/register")
     fun register(@RequestBody request: AuthRequestDTO): ResponseEntity<AuthResponseDTO> =
-        ResponseEntity.ok(authService.register(request))
+        ResponseEntity(authService.register(request), HttpStatus.CREATED)
 
     @PostMapping("/refresh")
     fun refresh(@RequestBody request: RefreshRequestDTO): ResponseEntity<AuthResponseDTO> =

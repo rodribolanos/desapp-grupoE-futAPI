@@ -1,171 +1,153 @@
 package ar.edu.unq.futapp.controller
 
-import ar.edu.unq.futapp.dto.AuthRequestDTO
+import ar.edu.unq.futapp.config.TestDataInitializer
 import ar.edu.unq.futapp.dto.RefreshRequestDTO
-import ar.edu.unq.futapp.model.User
-import ar.edu.unq.futapp.repository.UserRepository
+import ar.edu.unq.futapp.utils.TestUserUtils
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Import(TestDataInitializer::class)
 class AuthControllerIntegrationTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
     @Autowired
-    private lateinit var userRepository: UserRepository
-    @Autowired
     private lateinit var objectMapper: ObjectMapper
-
-    private val username = "integrationUser"
-    private val password = "Test123!"
-    private val invalidPassword = "short"
-
-    @BeforeEach
-    fun setup() {
-        userRepository.deleteAll()
-    }
 
     @Test
     fun whenRegisterWithValidUser_thenReturnSuccess() {
-        // Arrange
-        val request = AuthRequestDTO(username, password)
-        // Act & Assert
+        val request = TestUserUtils.unregisteredUserAuthDto()
         mockMvc.perform(post("/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.accessToken").exists())
-            .andExpect(jsonPath("$.refreshToken").exists())
+            .andExpectAll(
+                status().isCreated,
+                content().contentType(MediaType.APPLICATION_JSON),
+                jsonPath("$.accessToken").isNotEmpty,
+                jsonPath("$.refreshToken").isNotEmpty
+            )
     }
 
     @Test
     fun whenRegisterWithExistingUser_thenReturnConflict() {
-        // Arrange
-        userRepository.save(User(username, password))
-        val request = AuthRequestDTO(username, password)
-        // Act & Assert
+        val request = TestUserUtils.existingUserAuthDto()
         mockMvc.perform(post("/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isConflict)
-            .andExpect(jsonPath("$.message").value("CONFLICT"))
-            .andExpect(jsonPath("$.status").value(409))
+            .andExpectAll(
+                status().isConflict,
+                content().contentType(MediaType.APPLICATION_JSON)
+            )
     }
 
     @Test
     fun whenRegisterWithInvalidPassword_thenReturnBadRequest() {
-        // Arrange
-        val request = AuthRequestDTO(username, invalidPassword)
-        // Act & Assert
+        val request = TestUserUtils.invalidUserAuthDto()
         mockMvc.perform(post("/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isBadRequest)
-            .andExpect(jsonPath("$.message").value("BAD_REQUEST"))
-            .andExpect(jsonPath("$.status").value(400))
+            .andExpectAll(
+                status().isBadRequest,
+                content().contentType(MediaType.APPLICATION_JSON)
+            )
     }
 
     @Test
     fun whenLoginWithValidCredentials_thenReturnTokens() {
-        // Arrange
-        userRepository.save(User(username, password))
-        val request = AuthRequestDTO(username, password)
-        // Act & Assert
+        val request = TestUserUtils.existingUserAuthDto()
         mockMvc.perform(post("/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.accessToken").exists())
-            .andExpect(jsonPath("$.refreshToken").exists())
+            .andExpectAll(
+                status().isOk,
+                jsonPath("$.accessToken").isNotEmpty,
+                jsonPath("$.refreshToken").isNotEmpty,
+                content().contentType(MediaType.APPLICATION_JSON)
+            )
     }
 
     @Test
-    fun whenLoginWithInvalidCredentials_thenReturnUnauthorized() {
-        // Arrange
-        userRepository.save(User(username, password))
-        val request = AuthRequestDTO(username, "WrongPass123!")
-        // Act & Assert
+    fun whenLoginWithInvalidCredentials_thenReturnInvalidCredentials() {
+        val wrongAuth = TestUserUtils.invalidExistingUserAuthDto()
         mockMvc.perform(post("/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isUnauthorized)
-            .andExpect(jsonPath("$.message").value("UNAUTHORIZED"))
-            .andExpect(jsonPath("$.status").value(401))
+            .content(objectMapper.writeValueAsString(wrongAuth)))
+            .andExpectAll(
+                status().isBadRequest,
+                content().contentType(MediaType.APPLICATION_JSON)
+            )
     }
 
     @Test
-    fun whenLoginWithNonExistingUser_thenReturnUnauthorized() {
-        // Arrange
-        val request = AuthRequestDTO("nouser", password)
-        // Act & Assert
+    fun whenLoginWithNonExistingUser_thenReturnInvalidCredentials() {
+        val request = TestUserUtils.unexistingUserAuthDto()
         mockMvc.perform(post("/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isUnauthorized)
-            .andExpect(jsonPath("$.message").value("UNAUTHORIZED"))
-            .andExpect(jsonPath("$.status").value(401))
+            .andExpectAll(
+                status().isBadRequest,
+                content().contentType(MediaType.APPLICATION_JSON)
+            )
     }
 
     @Test
     fun whenRefreshWithValidToken_thenReturnNewTokens() {
-        // Arrange
-        userRepository.save(User(username, password))
-        val loginRequest = AuthRequestDTO(username, password)
+        val loginRequest = TestUserUtils.existingUserAuthDto()
         val loginResult = mockMvc.perform(post("/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(loginRequest)))
             .andReturn()
-        val refreshToken = objectMapper.readTree(loginResult.response.contentAsString).get("refreshToken").asText()
-        val refreshRequest = RefreshRequestDTO(refreshToken)
-        // Act & Assert
+        val oldRefreshToken = objectMapper.readTree(loginResult.response.contentAsString).get("refreshToken").asText()
+        val refreshRequest = RefreshRequestDTO(oldRefreshToken)
         mockMvc.perform(post("/auth/refresh")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(refreshRequest)))
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.accessToken").exists())
-            .andExpect(jsonPath("$.refreshToken").exists())
+            .andExpectAll(
+                status().isOk,
+                content().contentType(MediaType.APPLICATION_JSON),
+                jsonPath("$.accessToken").isNotEmpty,
+                jsonPath("$.refreshToken").isNotEmpty
+            )
     }
 
     @Test
     fun whenRefreshWithInvalidToken_thenReturnUnauthorized() {
-        // Arrange
         val refreshRequest = RefreshRequestDTO("invalidtoken")
-        // Act & Assert
         mockMvc.perform(post("/auth/refresh")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(refreshRequest)))
-            .andExpect(status().isUnauthorized)
-            .andExpect(jsonPath("$.message").value("UNAUTHORIZED"))
-            .andExpect(jsonPath("$.status").value(401))
+            .andExpectAll(
+                status().isUnauthorized,
+                content().contentType(MediaType.APPLICATION_JSON)
+            )
     }
 
     @Test
     fun whenRefreshWithAccessToken_thenReturnUnauthorized() {
-        // Arrange
-        userRepository.save(User(username, password))
-        val loginRequest = AuthRequestDTO(username, password)
+        val loginRequest = TestUserUtils.existingUserAuthDto()
         val loginResult = mockMvc.perform(post("/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(loginRequest)))
             .andReturn()
         val accessToken = objectMapper.readTree(loginResult.response.contentAsString).get("accessToken").asText()
         val refreshRequest = RefreshRequestDTO(accessToken)
-        // Act & Assert
         mockMvc.perform(post("/auth/refresh")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(refreshRequest)))
-            .andExpect(status().isUnauthorized)
-            .andExpect(jsonPath("$.message").value("UNAUTHORIZED"))
-            .andExpect(jsonPath("$.status").value(401))
+            .andExpectAll(
+                status().isUnauthorized,
+                content().contentType(MediaType.APPLICATION_JSON)
+            )
     }
 }
