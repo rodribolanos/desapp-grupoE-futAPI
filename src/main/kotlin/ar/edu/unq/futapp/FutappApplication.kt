@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = ["ar.edu.unq.futapp.repository"])
-class FutappApplication {
-    fun main(args: Array<String>) {
-        runApplication<FutappApplication>(*args)
-    }
+class FutappApplication
+
+fun main(args: Array<String>) {
+    runApplication<FutappApplication>(*args)
 }

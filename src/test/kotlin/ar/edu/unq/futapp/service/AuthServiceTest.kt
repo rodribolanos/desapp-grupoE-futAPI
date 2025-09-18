@@ -8,6 +8,7 @@ import ar.edu.unq.futapp.exception.InvalidCredentialsException
 import ar.edu.unq.futapp.exception.InvalidRefreshTokenException
 import ar.edu.unq.futapp.exception.UserAlreadyExistsException
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.*
@@ -36,6 +37,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Login with valid credentials returns tokens")
     fun whenLoginWithValidCredentials_thenReturnTokens() {
         // Arrange
         val expected = AuthResponseDTO(accessToken, refreshToken)
@@ -51,6 +53,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Login with invalid credentials throws InvalidCredentialsException")
     fun whenLoginWithInvalidCredentials_thenThrowInvalidCredentialsException() {
         // Arrange
         `when`(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken::class.java)))
@@ -61,6 +64,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Registering a new user returns tokens")
     fun whenRegisterWithNewUser_thenReturnTokens() {
         // Arrange
         val expected = AuthResponseDTO(accessToken, refreshToken)
@@ -75,6 +79,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Registering an existing user throws UserAlreadyExistsException")
     fun whenRegisterWithExistingUser_thenThrowUserAlreadyExistsException() {
         // Arrange
         doThrow(UserAlreadyExistsException("El usuario ya existe")).`when`(userService).register(username, password)
@@ -84,6 +89,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Refreshing with a valid token returns new tokens")
     fun whenRefreshWithValidToken_thenReturnNewTokens() {
         // Arrange
         val expected = AuthResponseDTO(accessToken, "new-$refreshToken")
@@ -100,6 +106,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Refreshing with an invalid token throws InvalidRefreshTokenException")
     fun whenRefreshWithInvalidToken_thenThrowInvalidRefreshTokenException() {
         // Arrange
         val refreshReq = RefreshRequestDTO(refreshToken)
@@ -109,6 +116,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Refreshing with a non-refresh token throws InvalidRefreshTokenException")
     fun whenRefreshWithNonRefreshToken_thenThrowInvalidRefreshTokenException() {
         // Arrange
         val refreshReq = RefreshRequestDTO(accessToken)
@@ -119,6 +127,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Refreshing with a valid token but null username throws InvalidRefreshTokenException")
     fun whenRefreshWithNullUsername_thenThrowInvalidRefreshTokenException() {
         // Arrange
         val refreshReq = RefreshRequestDTO(refreshToken)
