@@ -22,6 +22,10 @@ configurations {
 	}
 }
 
+springBoot {
+    mainClass.set("ar.edu.unq.futapp.FutappApplication")
+}
+
 repositories {
 	mavenCentral()
 }
