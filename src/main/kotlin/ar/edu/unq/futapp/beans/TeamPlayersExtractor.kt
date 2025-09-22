@@ -6,7 +6,6 @@ import ar.edu.unq.futapp.model.Team
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
-import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
 import java.time.Duration
 import org.springframework.stereotype.Component
@@ -15,8 +14,15 @@ import org.springframework.stereotype.Component
 class TeamPlayersExtractor {
     fun getTeamFromUrl(driver: WebDriver, url: String): Team {
         driver.get(url)
-        WebDriverWait(driver, Duration.ofSeconds(15))
-            .until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".table-ranking")))
+        // Si ya está el encabezado del equipo, no esperamos más
+        val hasHeader = driver.findElements(By.cssSelector("h2.panel-header")).isNotEmpty()
+        if (!hasHeader) {
+            WebDriverWait(driver, Duration.ofSeconds(15)).until {
+                it.findElements(By.cssSelector("h2.panel-header")).isNotEmpty() ||
+                it.findElements(By.cssSelector(".table-ranking")).isNotEmpty() ||
+                it.findElements(By.cssSelector("#top-player-stats-summary-grid tbody tr")).isNotEmpty()
+            }
+        }
         val teamNameElem = driver.findElements(By.cssSelector("h2.panel-header")).firstOrNull()
         val teamName =
             teamNameElem?.text?.replace("Plantilla del ", "")?.trim() ?: throw ParsingException("Team name not found")
