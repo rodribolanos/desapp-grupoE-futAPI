@@ -23,6 +23,13 @@ class GlobalExceptionHandler {
             HttpStatus.CONFLICT
         )
 
+    @ExceptionHandler(EntityNotFound::class)
+    fun handleEntityNotFound(ex: EntityNotFound): ResponseEntity<ExceptionDTO> =
+        ResponseEntity(
+            ExceptionDTO("NOT_FOUND", HttpStatus.NOT_FOUND.value(), ex.message ?: "Entidad no encontrada"),
+            HttpStatus.NOT_FOUND
+        )
+
     @ExceptionHandler(InvalidRefreshTokenException::class)
     fun handleInvalidRefresh(ex: InvalidRefreshTokenException): ResponseEntity<ExceptionDTO> =
         ResponseEntity(
@@ -37,13 +44,6 @@ class GlobalExceptionHandler {
             HttpStatus.BAD_REQUEST
         )
 
-    @ExceptionHandler(InvalidPasswordException::class)
-    fun handleInvalidPassword(ex: InvalidPasswordException): ResponseEntity<ExceptionDTO> =
-        ResponseEntity(
-            ExceptionDTO("BAD_REQUEST", HttpStatus.BAD_REQUEST.value(), ex.message ?: "Contraseña inválida"),
-            HttpStatus.BAD_REQUEST
-        )
-
     @ExceptionHandler(NoResourceFoundException::class)
     fun handleNoResourceFound(ex: NoResourceFoundException): ResponseEntity<ExceptionDTO> =
         ResponseEntity(
@@ -51,10 +51,25 @@ class GlobalExceptionHandler {
             HttpStatus.NOT_FOUND
         )
 
+    @ExceptionHandler(ParsingException::class)
+    fun handleParsingException(ex: ParsingException): ResponseEntity<ExceptionDTO> =
+        ResponseEntity(
+            ExceptionDTO("INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.message ?: "Error parsing data"),
+            HttpStatus.INTERNAL_SERVER_ERROR
+        )
+
+    @ExceptionHandler(InvalidPasswordException::class)
+    fun handleInvalidPassword(ex: InvalidPasswordException): ResponseEntity<ExceptionDTO> =
+        ResponseEntity(
+            ExceptionDTO("BAD_REQUEST", HttpStatus.BAD_REQUEST.value(), ex.message ?: "Contraseña inválida"),
+            HttpStatus.BAD_REQUEST
+        )
+
+
     @ExceptionHandler(Exception::class)
     fun handleGeneral(ex: Exception): ResponseEntity<ExceptionDTO> =
         ResponseEntity(
-            ExceptionDTO("INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.message ?: "Error interno del servidor"),
+            ExceptionDTO("INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error interno del servidor"),
             HttpStatus.INTERNAL_SERVER_ERROR
         )
 }

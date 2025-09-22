@@ -5,7 +5,6 @@ import ar.edu.unq.futapp.dto.AuthRequestDTO
 import ar.edu.unq.futapp.dto.AuthResponseDTO
 import ar.edu.unq.futapp.dto.RefreshRequestDTO
 import ar.edu.unq.futapp.exception.InvalidCredentialsException
-import ar.edu.unq.futapp.exception.UserAlreadyExistsException
 import ar.edu.unq.futapp.exception.InvalidRefreshTokenException
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -31,7 +30,7 @@ class AuthService(
     }
 
     fun register(request: AuthRequestDTO): AuthResponseDTO {
-        val registeredSuccessfully = userService.register(request.username, request.password)
+        userService.register(request.username, request.password)
         val accessToken = jwtUtil.generateToken(request.username)
         val refreshToken = jwtUtil.generateToken(request.username, isRefresh = true)
         return AuthResponseDTO(accessToken, refreshToken)
