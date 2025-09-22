@@ -1,12 +1,12 @@
 package ar.edu.unq.futapp.service
 
 import ar.edu.unq.futapp.config.JwtUtil
-import ar.edu.unq.futapp.dto.AuthRequestDTO
-import ar.edu.unq.futapp.dto.RefreshRequestDTO
-import ar.edu.unq.futapp.dto.AuthResponseDTO
 import ar.edu.unq.futapp.exception.InvalidCredentialsException
 import ar.edu.unq.futapp.exception.InvalidRefreshTokenException
 import ar.edu.unq.futapp.exception.UserAlreadyExistsException
+import ar.edu.unq.futapp.model.AuthRequest
+import ar.edu.unq.futapp.model.AuthResponse
+import ar.edu.unq.futapp.model.RefreshRequest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.*
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import java.util.Optional
+import java.util.*
 import kotlin.test.assertEquals
 
 class AuthServiceTest {
@@ -40,12 +40,12 @@ class AuthServiceTest {
     @DisplayName("Login with valid credentials returns tokens")
     fun whenLoginWithValidCredentials_thenReturnTokens() {
         // Arrange
-        val expected = AuthResponseDTO(accessToken, refreshToken)
+        val expected = AuthResponse(accessToken, refreshToken)
         `when`(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken::class.java)))
             .thenReturn(UsernamePasswordAuthenticationToken(username, password))
         `when`(jwtUtil.generateToken(username)).thenReturn(accessToken)
         `when`(jwtUtil.generateToken(username, true)).thenReturn(refreshToken)
-        val request = AuthRequestDTO(username, password)
+        val request = AuthRequest(username, password)
         // Act
         val response = authService.login(request)
         // Assert (comparación de objeto completo)
@@ -58,7 +58,7 @@ class AuthServiceTest {
         // Arrange
         `when`(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken::class.java)))
             .thenThrow(org.springframework.security.authentication.BadCredentialsException("bad"))
-        val request = AuthRequestDTO(username, password)
+        val request = AuthRequest(username, password)
         // Act & Assert
         assertThrows<InvalidCredentialsException> { authService.login(request) }
     }
@@ -67,11 +67,11 @@ class AuthServiceTest {
     @DisplayName("Registering a new user returns tokens")
     fun whenRegisterWithNewUser_thenReturnTokens() {
         // Arrange
-        val expected = AuthResponseDTO(accessToken, refreshToken)
+        val expected = AuthResponse(accessToken, refreshToken)
         doNothing().`when`(userService).register(username, password)
         `when`(jwtUtil.generateToken(username)).thenReturn(accessToken)
         `when`(jwtUtil.generateToken(username, true)).thenReturn(refreshToken)
-        val request = AuthRequestDTO(username, password)
+        val request = AuthRequest(username, password)
         // Act
         val response = authService.register(request)
         // Assert
@@ -83,7 +83,7 @@ class AuthServiceTest {
     fun whenRegisterWithExistingUser_thenThrowUserAlreadyExistsException() {
         // Arrange
         doThrow(UserAlreadyExistsException("El usuario ya existe")).`when`(userService).register(username, password)
-        val request = AuthRequestDTO(username, password)
+        val request = AuthRequest(username, password)
         // Act & Assert
         assertThrows<UserAlreadyExistsException> { authService.register(request) }
     }
@@ -92,8 +92,8 @@ class AuthServiceTest {
     @DisplayName("Refreshing with a valid token returns new tokens")
     fun whenRefreshWithValidToken_thenReturnNewTokens() {
         // Arrange
-        val expected = AuthResponseDTO(accessToken, "new-$refreshToken")
-        val refreshReq = RefreshRequestDTO(refreshToken)
+        val expected = AuthResponse(accessToken, "new-$refreshToken")
+        val refreshReq = RefreshRequest(refreshToken)
         `when`(jwtUtil.validateToken(refreshToken)).thenReturn(true)
         `when`(jwtUtil.isRefreshToken(refreshToken)).thenReturn(true)
         `when`(jwtUtil.getUsername(refreshToken)).thenReturn(Optional.of(username))
@@ -109,7 +109,7 @@ class AuthServiceTest {
     @DisplayName("Refreshing with an invalid token throws InvalidRefreshTokenException")
     fun whenRefreshWithInvalidToken_thenThrowInvalidRefreshTokenException() {
         // Arrange
-        val refreshReq = RefreshRequestDTO(refreshToken)
+        val refreshReq = RefreshRequest(refreshToken)
         `when`(jwtUtil.validateToken(refreshToken)).thenReturn(false)
         // Act & Assert
         assertThrows<InvalidRefreshTokenException> { authService.refresh(refreshReq) }
@@ -119,7 +119,7 @@ class AuthServiceTest {
     @DisplayName("Refreshing with a non-refresh token throws InvalidRefreshTokenException")
     fun whenRefreshWithNonRefreshToken_thenThrowInvalidRefreshTokenException() {
         // Arrange
-        val refreshReq = RefreshRequestDTO(accessToken)
+        val refreshReq = RefreshRequest(accessToken)
         `when`(jwtUtil.validateToken(accessToken)).thenReturn(true)
         `when`(jwtUtil.isRefreshToken(accessToken)).thenReturn(false)
         // Act & Assert
@@ -130,7 +130,7 @@ class AuthServiceTest {
     @DisplayName("Refreshing with a valid token but null username throws InvalidRefreshTokenException")
     fun whenRefreshWithNullUsername_thenThrowInvalidRefreshTokenException() {
         // Arrange
-        val refreshReq = RefreshRequestDTO(refreshToken)
+        val refreshReq = RefreshRequest(refreshToken)
         `when`(jwtUtil.validateToken(refreshToken)).thenReturn(true)
         `when`(jwtUtil.isRefreshToken(refreshToken)).thenReturn(true)
         `when`(jwtUtil.getUsername(refreshToken)).thenReturn(Optional.empty())

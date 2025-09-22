@@ -1,16 +1,41 @@
 package ar.edu.unq.futapp.exception
 
 import ar.edu.unq.futapp.dto.ExceptionDTO
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.validation.BindException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.servlet.resource.NoResourceFoundException
-import org.slf4j.LoggerFactory
 
 @ControllerAdvice
 class GlobalExceptionHandler {
     private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleValidationException(ex: MethodArgumentNotValidException): ResponseEntity<ExceptionDTO> {
+        val errors = ex.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "Error de validación") }
+        val description = errors.toString()
+        val exceptionDTO = ExceptionDTO(
+            "BAD_REQUEST",
+            HttpStatus.BAD_REQUEST.value(),
+            description
+        )
+        return ResponseEntity(exceptionDTO, HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleHttpMessageNotReadable(ex: HttpMessageNotReadableException): ResponseEntity<ExceptionDTO> {
+        val exceptionDTO = ExceptionDTO(
+            "BAD_REQUEST",
+            HttpStatus.BAD_REQUEST.value(),
+            "Malformed request"
+        )
+        return ResponseEntity(exceptionDTO, HttpStatus.BAD_REQUEST)
+    }
 
     @ExceptionHandler(InvalidCredentialsException::class)
     fun handleInvalidCredentials(ex: InvalidCredentialsException): ResponseEntity<ExceptionDTO> =
@@ -36,7 +61,11 @@ class GlobalExceptionHandler {
     @ExceptionHandler(InvalidRefreshTokenException::class)
     fun handleInvalidRefresh(ex: InvalidRefreshTokenException): ResponseEntity<ExceptionDTO> =
         ResponseEntity(
-            ExceptionDTO("UNAUTHORIZED", HttpStatus.UNAUTHORIZED.value(), ex.message ?: "Refresh token inválido o expirado"),
+            ExceptionDTO(
+                "UNAUTHORIZED",
+                HttpStatus.UNAUTHORIZED.value(),
+                ex.message ?: "Refresh token inválido o expirado"
+            ),
             HttpStatus.UNAUTHORIZED
         )
 
@@ -57,7 +86,11 @@ class GlobalExceptionHandler {
     @ExceptionHandler(ParsingException::class)
     fun handleParsingException(ex: ParsingException): ResponseEntity<ExceptionDTO> =
         ResponseEntity(
-            ExceptionDTO("INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.message ?: "Error parsing data"),
+            ExceptionDTO(
+                "INTERNAL_SERVER_ERROR",
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                ex.message ?: "Error parsing data"
+            ),
             HttpStatus.INTERNAL_SERVER_ERROR
         )
 
@@ -68,12 +101,15 @@ class GlobalExceptionHandler {
             HttpStatus.BAD_REQUEST
         )
 
-
     @ExceptionHandler(Exception::class)
     fun handleGeneral(ex: Exception): ResponseEntity<ExceptionDTO> {
         logger.error("Error interno del servidor", ex)
         return ResponseEntity(
-            ExceptionDTO("INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error interno del servidor"),
+            ExceptionDTO(
+                "INTERNAL_SERVER_ERROR",
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Error interno del servidor"
+            ),
             HttpStatus.INTERNAL_SERVER_ERROR
         )
     }
