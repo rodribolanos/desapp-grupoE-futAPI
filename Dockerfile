@@ -13,24 +13,39 @@ RUN chmod +x ./gradlew
 # Compilamos el jar (sin correr tests para que sea más rápido en despliegue)
 RUN ./gradlew clean build -x test
 
-# ---------- Etapa 2: Runtime ----------
-FROM eclipse-temurin:21-jre
+# ---------- Etapa 2: JRE base (para copiar el runtime Java) ----------
+FROM eclipse-temurin:21-jre AS jre
+
+# ---------- Etapa 3: Runtime ----------
+FROM debian:bookworm-slim
 
 WORKDIR /app
 
-# Instala Google Chrome for Testing v139 y ChromeDriver v139
+# Instala Firefox (ESR) y dependencias en Debian + descarga GeckoDriver
 RUN apt-get update \
-    && apt-get install -y wget unzip \
-    && mkdir -p /opt/chrome139 \
-    && wget -O /opt/chrome139/chromedriver-win64.zip "https://storage.googleapis.com/chrome-for-testing-public/139.0.7258.154/win64/chromedriver-win64.zip" \
-    && unzip /opt/chrome139/chromedriver-win64.zip -d /opt/chrome139/ \
-    && rm /opt/chrome139/chromedriver-win64.zip
+    && apt-get install -y --no-install-recommends \
+       ca-certificates wget curl tar unzip \
+       firefox-esr fonts-liberation \
+       libnss3 libatk-bridge2.0-0 libgtk-3-0 libx11-xcb1 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 libpangocairo-1.0-0 libatspi2.0-0 libdrm2 libxshmfence1 libxss1 libxtst6 \
+    && rm -rf /var/lib/apt/lists/* \
+    # Descargar e instalar GeckoDriver
+    && GECKO_VERSION=0.35.0 \
+    && wget -O /tmp/geckodriver.tar.gz "https://github.com/mozilla/geckodriver/releases/download/v${GECKO_VERSION}/geckodriver-v${GECKO_VERSION}-linux64.tar.gz" \
+    && tar -xzf /tmp/geckodriver.tar.gz -C /usr/local/bin \
+    && chmod +x /usr/local/bin/geckodriver \
+    && rm -f /tmp/geckodriver.tar.gz
 
-ENV CHROME_BIN=/opt/chrome139/chromedriver-win64/chrome.exe
-ENV CHROMEDRIVER_BIN=/opt/chrome139/chromedriver.exe
+# Copia el JRE de Temurin desde la etapa intermedia
+COPY --from=jre /opt/java/openjdk /opt/java/openjdk
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH="$JAVA_HOME/bin:$PATH"
 
-# Copiamos el jar compilado desde la etapa anterior
-COPY --from=builder /app/build/libs/*.jar app.jar
+# Variables usadas por el código Selenium
+ENV GECKO_DRIVER_PATH=/usr/local/bin/geckodriver
+ENV FIREFOX_BIN=/usr/bin/firefox-esr
+
+# Copiamos el jar ejecutable de Spring Boot desde la etapa de build
+COPY --from=builder /app/build/libs/futapp-0.0.1-SNAPSHOT.jar app.jar
 
 # Expone el puerto 8080 (cámbialo si usás otro)
 EXPOSE 8080

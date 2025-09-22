@@ -6,9 +6,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.servlet.resource.NoResourceFoundException
+import org.slf4j.LoggerFactory
 
 @ControllerAdvice
 class GlobalExceptionHandler {
+    private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
+
     @ExceptionHandler(InvalidCredentialsException::class)
     fun handleInvalidCredentials(ex: InvalidCredentialsException): ResponseEntity<ExceptionDTO> =
         ResponseEntity(
@@ -67,9 +70,11 @@ class GlobalExceptionHandler {
 
 
     @ExceptionHandler(Exception::class)
-    fun handleGeneral(ex: Exception): ResponseEntity<ExceptionDTO> =
-        ResponseEntity(
+    fun handleGeneral(ex: Exception): ResponseEntity<ExceptionDTO> {
+        logger.error("Error interno del servidor", ex)
+        return ResponseEntity(
             ExceptionDTO("INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error interno del servidor"),
             HttpStatus.INTERNAL_SERVER_ERROR
         )
+    }
 }

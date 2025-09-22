@@ -23,7 +23,7 @@ configurations {
 }
 
 springBoot {
-    mainClass.set("ar.edu.unq.futapp.FutappApplication")
+    mainClass.set("ar.edu.unq.futapp.FutappApplicationKt")
 }
 
 repositories {
@@ -50,8 +50,6 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
     implementation("org.seleniumhq.selenium:selenium-java:4.35.0")
-    implementation("org.seleniumhq.selenium:selenium-edge-driver:4.35.0")
-    implementation("io.github.bonigarcia:webdrivermanager:5.5.0")
 }
 
 kotlin {
