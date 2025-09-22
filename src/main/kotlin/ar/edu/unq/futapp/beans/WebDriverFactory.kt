@@ -18,9 +18,9 @@ class WebDriverFactory {
             options.setBinary(firefoxBin)
         }
         if (headless) {
-            options.addArguments("-headless")
-            options.addArguments("--width=1920")
-            options.addArguments("--height=1080")
+            options.addArguments("--headless")
+            options.addArguments("--width=800")
+            options.addArguments("--height=600")
         }
         return FirefoxDriver(options)
     }

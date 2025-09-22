@@ -20,7 +20,7 @@ class WhoScoredTeamProxyService @Autowired constructor(
     override fun findTeam(teamName: String): Optional<Team> {
         var driver: WebDriver? = null
         try {
-            driver = webDriverFactory.createDriver()
+            driver = webDriverFactory.createDriver(headless = true)
             val teamUrl = teamUrlExtractor.getFirstTeamUrl(driver, teamName)
             val team = teamPlayersExtractor.getTeamFromUrl(driver, teamUrl)
             return Optional.of(team)

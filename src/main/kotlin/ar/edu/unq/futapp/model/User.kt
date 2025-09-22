@@ -20,14 +20,12 @@ class User {
 
     constructor(username: String, password: String) {
         this.username = username
-        // Acepta contraseñas en texto plano o encriptadas; la validación ocurre en el servicio
         this.password = password
     }
 
     fun username(): String = username
     fun password(): String = password
     fun password(newPassword: String) {
-        // Setter simple; el servicio debe asegurarse de validar/encodear antes de setear
         this.password = newPassword
     }
 }
