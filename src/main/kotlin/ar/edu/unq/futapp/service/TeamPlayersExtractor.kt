@@ -26,12 +26,12 @@ class TeamPlayersExtractor {
     }
 
     private fun extractedPlayers(playerRows: List<WebElement>): List<Player> {
-        return playerRows.mapNotNull { row -> extractedPlayer(row) }
+        return playerRows.map { row -> extractedPlayer(row) }
     }
 
-    private fun extractedPlayer(row: WebElement): Player? {
+    private fun extractedPlayer(row: WebElement): Player {
         val columns = row.findElements(By.cssSelector("td"))
-        if (columns.size < 15) return null
+        if (columns.size < 15) throw ParsingException("Unexpected number of columns: ${columns.size}")
         val name = extractPlayerName(columns)
         val playedGames = extractPlayedGames(columns)
         val goals = extractGoals(columns)
