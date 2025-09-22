@@ -1,5 +1,6 @@
 package ar.edu.unq.futapp.config
 
+import ar.edu.unq.futapp.beans.JwtAuthenticationFilter
 import ar.edu.unq.futapp.service.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

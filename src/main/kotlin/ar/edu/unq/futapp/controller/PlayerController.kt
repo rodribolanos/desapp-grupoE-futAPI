@@ -2,7 +2,7 @@ package ar.edu.unq.futapp.controller
 
 import ar.edu.unq.futapp.dto.PlayerDTO
 import ar.edu.unq.futapp.dto.toDTO
-import ar.edu.unq.futapp.service.TeamService
+import ar.edu.unq.futapp.service.TeamServiceImpl
 import jakarta.validation.constraints.NotBlank
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/teams")
 class PlayerController {
     @Autowired
-    private lateinit var teamService: TeamService
+    private lateinit var teamService: TeamServiceImpl
 
     @GetMapping("/{teamName}/players")
     fun playersFromTeam(
@@ -25,6 +25,6 @@ class PlayerController {
         @NotBlank(message = "teamName must not be empty or null")
         teamName: String
     ): ResponseEntity<List<PlayerDTO>> {
-        return ResponseEntity.ok(teamService.findTeamPlayers(teamName).toDTO())
+        return ResponseEntity.ok(teamService.findPlayersByTeam(teamName).toDTO())
     }
 }

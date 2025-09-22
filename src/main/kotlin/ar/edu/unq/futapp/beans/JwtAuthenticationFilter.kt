@@ -1,4 +1,4 @@
-package ar.edu.unq.futapp.config
+package ar.edu.unq.futapp.beans
 
 import ar.edu.unq.futapp.service.UserService
 import jakarta.servlet.FilterChain

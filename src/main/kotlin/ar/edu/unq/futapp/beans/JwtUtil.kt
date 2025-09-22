@@ -1,10 +1,10 @@
-package ar.edu.unq.futapp.config
+package ar.edu.unq.futapp.beans
 
-import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.Claims
+import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
-import java.util.Date
 import org.springframework.stereotype.Component
+import java.util.Date
 import java.util.Optional
 
 @Component

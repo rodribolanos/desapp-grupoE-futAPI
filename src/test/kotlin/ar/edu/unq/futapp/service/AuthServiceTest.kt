@@ -1,6 +1,6 @@
 package ar.edu.unq.futapp.service
 
-import ar.edu.unq.futapp.config.JwtUtil
+import ar.edu.unq.futapp.beans.JwtUtil
 import ar.edu.unq.futapp.exception.InvalidCredentialsException
 import ar.edu.unq.futapp.exception.InvalidRefreshTokenException
 import ar.edu.unq.futapp.exception.UserAlreadyExistsException
@@ -33,7 +33,7 @@ class AuthServiceTest {
         userService = mock(UserService::class.java)
         jwtUtil = mock(JwtUtil::class.java)
         authenticationManager = mock(AuthenticationManager::class.java)
-        authService = AuthService(userService, jwtUtil, authenticationManager)
+        authService = AuthServiceImpl(userService, jwtUtil, authenticationManager)
     }
 
     @Test
