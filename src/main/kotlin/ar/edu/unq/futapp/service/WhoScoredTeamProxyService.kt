@@ -5,8 +5,7 @@ import ar.edu.unq.futapp.exception.InternalServerException
 import ar.edu.unq.futapp.model.Team
 import ar.edu.unq.futapp.beans.TeamPlayersExtractor
 import ar.edu.unq.futapp.beans.TeamUrlExtractor
-import ar.edu.unq.futapp.beans.WebDriverFactory
-import org.openqa.selenium.WebDriver
+import ar.edu.unq.futapp.beans.WebBrowserFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*
@@ -15,21 +14,20 @@ import java.util.*
 class WhoScoredTeamProxyService @Autowired constructor(
     private val teamUrlExtractor: TeamUrlExtractor,
     private val teamPlayersExtractor: TeamPlayersExtractor,
-    private val webDriverFactory: WebDriverFactory
+    private val webBrowserFactory: WebBrowserFactory
 ): TeamApiClient {
     override fun findTeam(teamName: String): Optional<Team> {
-        var driver: WebDriver? = null
+        val browser = webBrowserFactory.create(headless = true)
         try {
-            driver = webDriverFactory.createDriver(headless = true)
-            val teamUrl = teamUrlExtractor.getFirstTeamUrl(driver, teamName)
-            val team = teamPlayersExtractor.getTeamFromUrl(driver, teamUrl)
+            val teamUrl = teamUrlExtractor.getFirstTeamUrl(browser, teamName)
+            val team = teamPlayersExtractor.getTeamFromUrl(browser, teamUrl)
             return Optional.of(team)
         } catch (e: EntityNotFound) {
             throw e
         } catch (e: Exception) {
             throw InternalServerException(e.message)
         } finally {
-            driver?.quit()
+            browser.close()
         }
     }
 }

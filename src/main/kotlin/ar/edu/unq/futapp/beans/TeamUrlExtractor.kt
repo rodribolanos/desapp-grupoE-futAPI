@@ -1,13 +1,10 @@
 package ar.edu.unq.futapp.beans
 
 import ar.edu.unq.futapp.exception.EntityNotFound
-import org.openqa.selenium.By
-import org.openqa.selenium.WebDriver
 import org.springframework.stereotype.Component
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 import java.time.Duration
-import org.openqa.selenium.support.ui.WebDriverWait
 
 @Component
 class TeamUrlExtractor {
@@ -21,20 +18,22 @@ class TeamUrlExtractor {
             .toUri()
     }
 
-    fun getFirstTeamUrl(driver: WebDriver, teamName: String): String {
+    fun getFirstTeamUrl(browser: WebBrowser, teamName: String): String {
         val uri = buildSearchUri(teamName)
-        driver.get(uri.toString())
-        WebDriverWait(driver, Duration.ofSeconds(15)).until {
-            it.findElements(By.cssSelector(".search-result")).isNotEmpty() ||
-                    it.findElements(By.cssSelector("span.search-message")).isNotEmpty()
-        }
-        if (driver.findElements(By.cssSelector("span.search-message")).isNotEmpty()) {
+        browser.goTo(uri.toString())
+        browser.waitFor(".search-result, span.search-message", Duration.ofSeconds(15))
+        return parseFirstTeamUrlFromCurrentPage(browser, teamName)
+    }
+
+    private fun parseFirstTeamUrlFromCurrentPage(browser: WebBrowser, teamName: String): String {
+        if (browser.queryAll("span.search-message").isNotEmpty()) {
             throw EntityNotFound("Team with name $teamName not found")
         }
-        val firstTeamRow = driver.findElements(By.cssSelector(".search-result table tbody tr"))
-            .firstOrNull { it.findElements(By.cssSelector("td a")).isNotEmpty() }
+        val firstTeamRow = browser
+            .queryAll(".search-result table tbody tr")
+            .firstOrNull { it.queryAll("td a").isNotEmpty() }
             ?: throw EntityNotFound("Team with name $teamName not found")
-        val href = firstTeamRow.findElement(By.cssSelector("td a")).getAttribute("href")
+        val href = firstTeamRow.queryAll("td a").first().attr("href") ?: ""
         return if (href.startsWith("http")) href else "https://es.whoscored.com$href"
     }
 }

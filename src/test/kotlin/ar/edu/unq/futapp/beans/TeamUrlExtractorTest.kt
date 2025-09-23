@@ -1,40 +1,62 @@
 package ar.edu.unq.futapp.beans
 
 import ar.edu.unq.futapp.exception.EntityNotFound
+import ar.edu.unq.futapp.testconfig.JsoupBrowserTestConfig
 import ar.edu.unq.futapp.utils.TeamApiUtils
+import io.mockk.every
+import io.mockk.spyk
 import org.junit.jupiter.api.*
-import org.openqa.selenium.WebDriver
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SpringBootTest
+@Import(JsoupBrowserTestConfig::class)
 class TeamUrlExtractorTest {
-    private val webDriverFactory = WebDriverFactory()
-    private lateinit var driver: WebDriver
+    @Autowired
+    private lateinit var webBrowserFactory: WebBrowserFactory
+    private lateinit var realBrowser: WebBrowser
+    private lateinit var browser: WebBrowser
     private val extractor = TeamUrlExtractor()
 
-    @BeforeAll
+    @BeforeEach
     fun setup() {
-        driver = webDriverFactory.createDriver()
+        realBrowser = webBrowserFactory.create()
+        browser = spyk(realBrowser, recordPrivateCalls = false)
     }
 
     @AfterAll
     fun tearDown() {
-        driver.quit()
+        browser.close()
     }
 
     @Test
     @DisplayName("Extracts the first team URL when the page has results")
     fun whenPageHasResults_thenExtractsFirstTeamUrl() {
-        driver.get(TeamApiUtils.pageWithResultsUri().toString())
-        val url = extractor.getFirstTeamUrl(driver, "Boca Juniors")
-        Assertions.assertTrue(url.startsWith("https://es.whoscored.com"))
+        val expectedURL = "https://es.whoscored.com/teams/889/show/argentina-boca-juniors"
+
+        every { browser.goTo(any()) } answers {
+            callOriginal()
+            realBrowser.goTo(TeamApiUtils.pageWithResultsUri().toString())
+        }
+
+        val actualURL = extractor.getFirstTeamUrl(browser, "Boca Juniors")
+
+        Assertions.assertEquals(expectedURL, actualURL)
     }
+
+
 
     @Test
     @DisplayName("Throws EntityNotFound when the page has no results")
     fun whenPageHasNoResults_thenThrowsEntityNotFound() {
-        driver.get(TeamApiUtils.pageWithoutResultsUri().toString())
+        every { browser.goTo(any()) } answers {
+            callOriginal()
+            realBrowser.goTo(TeamApiUtils.pageWithoutResultsUri().toString())
+        }
         Assertions.assertThrows(EntityNotFound::class.java) {
-            extractor.getFirstTeamUrl(driver, "EquipoInexistente")
+            extractor.getFirstTeamUrl(browser, "EquipoInexistente")
         }
     }
 }
