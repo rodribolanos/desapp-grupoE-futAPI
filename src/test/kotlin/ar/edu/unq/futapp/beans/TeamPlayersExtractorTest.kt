@@ -2,29 +2,26 @@ package ar.edu.unq.futapp.beans
 
 import ar.edu.unq.futapp.exception.ParsingException
 import ar.edu.unq.futapp.utils.TeamApiUtils
-import ar.edu.unq.futapp.testconfig.JsoupBrowserTestConfig
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Import
 
 @SpringBootTest
-@Import(JsoupBrowserTestConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TeamPlayersExtractorTest {
     @Autowired
-    private lateinit var webBrowserFactory: WebBrowserFactory
+    private lateinit var webDriverFactory: WebBrowserFactory
     private lateinit var browser: WebBrowser
     private val extractor = TeamPlayersExtractor()
+
+    @BeforeAll
+    fun setup() {
+        browser = webDriverFactory.create(headless = true)
+    }
 
     @AfterAll
     fun tearDown() {
         browser.close()
-    }
-
-    @BeforeAll
-    fun setUp() {
-        browser = webBrowserFactory.create()
     }
 
     @Test
@@ -40,8 +37,8 @@ class TeamPlayersExtractorTest {
     @DisplayName("Handles malformed player list page")
     fun whenMalformedPlayerListPage_thenHandlesParsing() {
         val uri = TeamApiUtils.malformedPlayerListPageUri()
-        Assertions.assertThrows(ParsingException::class.java) {
+        Assertions.assertThrows(ParsingException::class.java, {
             extractor.getTeamFromUrl(browser, uri.toString())
-        }
+        })
     }
 }

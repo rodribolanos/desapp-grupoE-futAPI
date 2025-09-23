@@ -11,14 +11,12 @@ import java.time.Duration
 class JsoupWebBrowser : WebBrowser {
     private var doc: Document? = null
 
+    constructor(uri: URI) {
+        doc = Jsoup.parse(File(uri), "UTF-8")
+    }
+
     override fun goTo(url: String) {
-        val uri = URI(url)
-        doc = if (uri.scheme.equals("file", ignoreCase = true)) {
-            Jsoup.parse(File(uri), "UTF-8")
-        } else {
-            // Permite también cargar desde http/https si se usa esta impl (no recomendado en prod)
-            Jsoup.connect(url).get()
-        }
+        // Preload
     }
 
     override fun waitFor(selector: String, timeout: Duration): Boolean {
