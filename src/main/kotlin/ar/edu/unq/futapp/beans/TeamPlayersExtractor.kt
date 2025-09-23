@@ -61,26 +61,30 @@ class TeamPlayersExtractor {
 
     private fun extractPlayedGames(columns: List<HtmlElement>): Int {
         val appsText = extractColumnValue(columns, 4)
-        if (appsText.isBlank() || appsText == "-") return 0
+        if (isInvalidData(appsText)) return 0
         val match = Regex("\\d+").find(appsText)?.value
         return match?.toIntOrNull() ?: throw ParsingException("Unable to parse played games from: '$appsText'")
     }
 
     private fun extractGoals(columns: List<HtmlElement>): Int {
         val goalsText = extractColumnValue(columns, 6)
-        if (goalsText.isBlank() || goalsText == "-") return 0
+        if (isInvalidData(goalsText)) return 0
         return goalsText.toIntOrNull() ?: throw ParsingException("Unable to parse goals from: '$goalsText'")
     }
 
     private fun extractAssists(columns: List<HtmlElement>): Int {
         val assistsText = extractColumnValue(columns, 7)
-        if (assistsText.isBlank() || assistsText == "-") return 0
+        if (isInvalidData(assistsText)) return 0
         return assistsText.toIntOrNull() ?: throw ParsingException("Unable to parse assists from: '$assistsText'")
     }
 
     private fun extractRating(columns: List<HtmlElement>): Double {
         val ratingText = extractColumnValue(columns, 14)
-        if (ratingText.isBlank() || ratingText == "-") return 0.0
+        if (isInvalidData(ratingText)) return 0.0
         return ratingText.toDoubleOrNull() ?: throw ParsingException("Unable to parse rating from: '$ratingText'")
+    }
+
+    private fun isInvalidData(text: String): Boolean {
+        return text.isBlank() || text == "-" || text.equals("N/A", ignoreCase = true)
     }
 }
