@@ -37,7 +37,7 @@ jobs:
 
       # Instalar GeckoDriver (driver de Firefox)
       - name: Set up GeckoDriver
-        uses: browser-actions/setup-geckodriver@v1
+        uses: browser-actions/setup-geckodriver@latest
 
       # Exportar variables de entorno para Selenium
       - name: Export FIREFOX_BIN and GECKO_DRIVER_PATH
