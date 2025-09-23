@@ -30,7 +30,11 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/auth/**").permitAll()
+                    .requestMatchers(
+                        "/auth/**",
+                        "/swagger-ui/**",
+                        "/api-docs/**",
+                        "/swagger-ui.html").permitAll()
                     .anyRequest().authenticated()
             }
             .authenticationProvider(authenticationProvider())
@@ -47,7 +51,8 @@ class SecurityConfig(
 
     @Bean
     fun authenticationProvider(): DaoAuthenticationProvider {
-        val authProvider = DaoAuthenticationProvider(userService)
+        val authProvider = DaoAuthenticationProvider(passwordEncoder)
+        authProvider.setUserDetailsService(userService)
         authProvider.setPasswordEncoder(passwordEncoder)
         return authProvider
     }
