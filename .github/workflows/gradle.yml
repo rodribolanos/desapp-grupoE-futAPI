@@ -29,11 +29,11 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # Instalar Firefox ESR con la acción oficial (apt no provee firefox-esr en ubuntu-latest)
-      - name: Set up Firefox ESR
+      # Instalar Firefox con la acción oficial (versión normal)
+      - name: Set up Firefox
         uses: browser-actions/setup-firefox@v1
         with:
-          firefox-version: latest-esr
+          firefox-version: latest
 
       # Instalar GeckoDriver (driver de Firefox)
       - name: Set up GeckoDriver
