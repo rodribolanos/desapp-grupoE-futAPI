@@ -35,6 +35,10 @@ jobs:
         with:
           firefox-version: latest
 
+      # Instalar GeckoDriver (driver de Firefox)
+      - name: Set up GeckoDriver
+        uses: browser-actions/setup-geckodriver@latest
+
       # Configuración de Gradle con cache
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0

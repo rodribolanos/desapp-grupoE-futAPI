@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service
 import java.util.Optional
 
 @Service
-class TeamServiceImpl @Autowired constructor(val teamProxyService: WhoScoredTeamProxyService): TeamService {
+class TeamServiceImpl @Autowired constructor(val teamApiClient: TeamApiClient): TeamService {
     override fun findPlayersByTeam(teamName: String): List<Player> {
-        val team: Optional<Team> = teamProxyService.findTeam(teamName)
+        val team: Optional<Team> = teamApiClient.findTeam(teamName)
         if(team.isEmpty) throw EntityNotFound("Team with name $teamName not found")
         return team.get().players
     }
