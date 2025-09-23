@@ -2,11 +2,11 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: 
+    branches:
       - main
       - develop
   pull_request:
-    branches: 
+    branches:
       - main
       - develop
 
@@ -29,27 +29,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # Instalar Firefox con la acción oficial (versión normal)
-      - name: Set up Firefox
-        uses: browser-actions/setup-firefox@v1
-        with:
-          firefox-version: latest
-
-      # Instalar GeckoDriver (driver de Firefox)
-      - name: Set up GeckoDriver
-        uses: browser-actions/setup-geckodriver@latest
-
-      # Exportar variables de entorno para Selenium
-      - name: Export FIREFOX_BIN and GECKO_DRIVER_PATH
-        shell: bash
-        run: |
-          echo "FIREFOX_BIN=$(command -v firefox)" >> $GITHUB_ENV
-          echo "GECKO_DRIVER_PATH=$(command -v geckodriver)" >> $GITHUB_ENV
-
       # Configuración de Gradle con cache
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-      
+
       # Compilación + tests
       - name: Build with Gradle Wrapper
         run: ./gradlew build
