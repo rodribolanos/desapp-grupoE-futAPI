@@ -29,22 +29,11 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # Instalar Firefox para las pruebas Selenium
-      - name: Set up Firefox
-        uses: browser-actions/setup-firefox@v1
-        with:
-          firefox-version: latest
-
-      # Instalar GeckoDriver (driver de Firefox)
-      - name: Set up GeckoDriver
-        uses: browser-actions/setup-geckodriver@latest
-
-      # Exportar variables de entorno para Selenium
-      - name: Export FIREFOX_BIN and GECKO_DRIVER_PATH env vars
-        shell: bash
+      # Instalar Firefox con apt (Selenium Manager gestiona GeckoDriver)
+      - name: Install Firefox
         run: |
-          echo "FIREFOX_BIN=$(which firefox)" >> $GITHUB_ENV
-          echo "GECKO_DRIVER_PATH=$(which geckodriver)" >> $GITHUB_ENV
+          sudo apt-get update
+          sudo apt-get install -y firefox
 
       # Configuración de Gradle con cache
       - name: Setup Gradle
