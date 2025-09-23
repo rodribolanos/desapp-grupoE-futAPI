@@ -29,7 +29,7 @@ RUN apt-get update \
        libnss3 libatk-bridge2.0-0 libgtk-3-0 libx11-xcb1 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 libpangocairo-1.0-0 libatspi2.0-0 libdrm2 libxshmfence1 libxss1 libxtst6 \
     && rm -rf /var/lib/apt/lists/* \
     # Descargar e instalar GeckoDriver
-    && GECKO_VERSION=0.35.0 \
+    && GECKO_VERSION=0.36.0 \
     && wget -O /tmp/geckodriver.tar.gz "https://github.com/mozilla/geckodriver/releases/download/v${GECKO_VERSION}/geckodriver-v${GECKO_VERSION}-linux64.tar.gz" \
     && tar -xzf /tmp/geckodriver.tar.gz -C /usr/local/bin \
     && chmod +x /usr/local/bin/geckodriver \
