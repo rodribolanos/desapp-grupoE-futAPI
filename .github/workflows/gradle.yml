@@ -29,11 +29,22 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # Instalar Firefox con apt (Selenium Manager gestiona GeckoDriver)
-      - name: Install Firefox
+      # Instalar Firefox ESR con apt (Selenium Manager gestiona GeckoDriver)
+      - name: Install Firefox ESR
         run: |
           sudo apt-get update
-          sudo apt-get install -y firefox
+          sudo apt-get install -y firefox-esr
+
+      # Instalar GeckoDriver (driver de Firefox)
+      - name: Set up GeckoDriver
+        uses: browser-actions/setup-geckodriver@latest
+
+      # Exportar variables de entorno para Selenium
+      - name: Export FIREFOX_BIN and GECKO_DRIVER_PATH
+        shell: bash
+        run: |
+          echo "FIREFOX_BIN=$(command -v firefox-esr || command -v firefox)" >> $GITHUB_ENV
+          echo "GECKO_DRIVER_PATH=$(command -v geckodriver)" >> $GITHUB_ENV
 
       # Configuración de Gradle con cache
       - name: Setup Gradle
