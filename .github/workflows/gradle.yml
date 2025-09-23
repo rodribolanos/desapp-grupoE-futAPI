@@ -29,6 +29,12 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      # Instalar Firefox para las pruebas Selenium
+      - name: Set up Firefox
+        uses: browser-actions/setup-firefox@v1
+        with:
+          firefox-version: latest
+
       # Configuración de Gradle con cache
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
