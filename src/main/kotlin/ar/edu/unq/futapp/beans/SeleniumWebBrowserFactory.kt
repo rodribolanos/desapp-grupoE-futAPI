@@ -1,5 +1,6 @@
 package ar.edu.unq.futapp.beans
 
+import org.openqa.selenium.remote.RemoteWebDriver
 import org.springframework.stereotype.Component
 
 @Component
