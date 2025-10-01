@@ -5,9 +5,11 @@ import ar.edu.unq.futapp.utils.TeamApiUtils
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Profile
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
+@Profile(value = ["test"])
 class TeamUrlExtractorTest {
     @Autowired
     private lateinit var webDriverFactory: WebBrowserFactory
