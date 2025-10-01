@@ -9,15 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TeamPlayersExtractorTest {
-    @Autowired
-    private lateinit var webDriverFactory: WebBrowserFactory
-    private lateinit var browser: WebBrowser
+    lateinit var browser : JsoupWebBrowser
     private val extractor = TeamPlayersExtractor()
-
-    @BeforeAll
-    fun setup() {
-        browser = webDriverFactory.create(headless = true)
-    }
 
     @AfterAll
     fun tearDown() {
@@ -29,6 +22,7 @@ class TeamPlayersExtractorTest {
     fun whenValidPlayerListPage_thenParsesTeamName() {
         val expectedTeam = TeamApiUtils.expectedTeamForPlayerListPage()
         val uri = TeamApiUtils.playerListPageUri()
+        browser = JsoupWebBrowser(TeamApiUtils.playerListPageUri())
         val team = extractor.getTeamFromUrl(browser, uri.toString())
         Assertions.assertEquals(expectedTeam, team)
     }
@@ -37,6 +31,7 @@ class TeamPlayersExtractorTest {
     @DisplayName("Handles malformed player list page")
     fun whenMalformedPlayerListPage_thenHandlesParsing() {
         val uri = TeamApiUtils.malformedPlayerListPageUri()
+        browser = JsoupWebBrowser(TeamApiUtils.malformedPlayerListPageUri())
         Assertions.assertThrows(ParsingException::class.java, {
             extractor.getTeamFromUrl(browser, uri.toString())
         })
