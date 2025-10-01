@@ -27,11 +27,7 @@ class SeleniumWebBrowser(private val driver: WebDriver) : WebBrowser {
     }
 
     override fun close() {
-        try {
-            driver.quit()
-        } catch (_: Exception) {
-            // ignore
-        }
+        // No hacemos nada: la sesión se preserva y el cierre lo gestiona Spring (destroyMethod="quit").
     }
 }
 

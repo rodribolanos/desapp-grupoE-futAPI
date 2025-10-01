@@ -4,16 +4,21 @@ import ar.edu.unq.futapp.model.HtmlElement
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.stereotype.Component
 import java.io.File
 import java.net.URI
 import java.time.Duration
 
+@Component
 class JsoupWebBrowser : WebBrowser {
     private var doc: Document? = null
 
     constructor(uri: URI) {
         doc = Jsoup.parse(File(uri), "UTF-8")
     }
+
+    constructor()
 
     override fun goTo(url: String) {
         // Preload
