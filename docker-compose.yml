@@ -6,11 +6,14 @@ services:
       - "4444:4444"
     tmpfs:
       - /tmp:exec
+    environment:
+      - SE_BROWSER_USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4444/status"]
-      interval: 10s
+      test: ["CMD-SHELL", "curl -sf http://localhost:4444/status >/dev/null || exit 1"]
+      interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 30
+      start_period: 10s
 
   futapp:
     build:
@@ -21,7 +24,6 @@ services:
       - "8080:8080"
     environment:
       - WEBDRIVER_URL=http://selenium:4444/wd/hub
-      - SPRING_PROFILES_ACTIVE=prod
     depends_on:
       selenium:
         condition: service_healthy

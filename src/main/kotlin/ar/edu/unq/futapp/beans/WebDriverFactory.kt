@@ -4,20 +4,20 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.remote.RemoteWebDriver
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Lazy
 import java.net.MalformedURLException
 import java.net.URI
 import java.time.Duration
 
 @Configuration
-@ConditionalOnMissingBean(WebBrowserFactory::class)
 class WebDriverFactory {
-    @Value("\${webdriver.url}")
+    @Value("\${webdriver.url:http://selenium:4444/wd/hub}")
     private lateinit var REMOTE_URL_ENV: String
 
     @Bean(destroyMethod = "quit")
+    @Lazy
     fun webDriver(): WebDriver {
         val remoteUrl = try {
             URI.create(REMOTE_URL_ENV).toURL()
@@ -31,4 +31,10 @@ class WebDriverFactory {
         driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(30))
         return driver
     }
+
+    @Bean
+    fun webBrowserFactory(@Lazy webDriver: WebDriver): WebBrowserFactory =
+        object : WebBrowserFactory {
+            override fun create(headless: Boolean): WebBrowser = SeleniumWebBrowser(webDriver)
+        }
 }
