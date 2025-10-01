@@ -11,15 +11,8 @@ import org.springframework.context.annotation.Profile
 @SpringBootTest
 @Profile(value = ["test"])
 class TeamUrlExtractorTest {
-    @Autowired
-    private lateinit var webDriverFactory: WebBrowserFactory
-    private lateinit var browser: WebBrowser
+    lateinit var browser : JsoupWebBrowser
     private val extractor = TeamUrlExtractor()
-
-    @BeforeAll
-    fun setup() {
-        browser = webDriverFactory.create(headless = true)
-    }
 
     @AfterAll
     fun tearDown() {
@@ -30,6 +23,7 @@ class TeamUrlExtractorTest {
     @DisplayName("Extracts the first team URL when the page has results")
     fun whenPageHasResults_thenExtractsFirstTeamUrl() {
         val expectedURL = "https://es.whoscored.com/teams/889/show/argentina-boca-juniors"
+        browser = JsoupWebBrowser(TeamApiUtils.pageWithResultsUri())
 
         val actualURL = extractor.getFirstTeamUrl(browser, "Boca Juniors")
 
@@ -39,6 +33,7 @@ class TeamUrlExtractorTest {
     @Test
     @DisplayName("Throws EntityNotFound when the page has no results")
     fun whenPageHasNoResults_thenThrowsEntityNotFound() {
+        browser = JsoupWebBrowser(TeamApiUtils.pageWithoutResultsUri())
         Assertions.assertThrows(EntityNotFound::class.java) {
             extractor.getFirstTeamUrl(browser, "EquipoInexistente")
         }

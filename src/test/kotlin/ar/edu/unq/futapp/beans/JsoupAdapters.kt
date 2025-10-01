@@ -4,35 +4,24 @@ import ar.edu.unq.futapp.model.HtmlElement
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.stereotype.Component
 import java.io.File
 import java.net.URI
 import java.time.Duration
 
+@Component
 class JsoupWebBrowser : WebBrowser {
     private var doc: Document? = null
 
-    // Nuevo: constructor sin args para permitir usar goTo(url)
-    constructor()
-
-    // Constructor existente: precarga desde un archivo
-    constructor(uri: URI) : this() {
+    constructor(uri: URI) {
         doc = Jsoup.parse(File(uri), "UTF-8")
     }
 
+    constructor()
+
     override fun goTo(url: String) {
-        // En tests trabajamos con archivos locales
-        try {
-            val uri = URI(url)
-            if (uri.scheme.equals("file", ignoreCase = true)) {
-                doc = Jsoup.parse(File(uri), "UTF-8")
-            } else {
-                // Fallback simple por si alguna vez se usa http(s) en tests
-                doc = Jsoup.connect(url).get()
-            }
-        } catch (e: Exception) {
-            // Si no se puede cargar, dejamos doc en null para que los selects fallen en vacío
-            doc = null
-        }
+        // Preload
     }
 
     override fun waitFor(selector: String, timeout: Duration): Boolean {
