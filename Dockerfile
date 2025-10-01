@@ -5,6 +5,7 @@ COPY build.gradle.kts settings.gradle.kts ./
 COPY gradlew gradlew.bat ./
 COPY gradle/wrapper/ ./gradle/wrapper/
 COPY src ./src
+RUN chmod +x gradlew
 RUN ./gradlew clean bootJar
 
 # Stage 2: Create the final image
