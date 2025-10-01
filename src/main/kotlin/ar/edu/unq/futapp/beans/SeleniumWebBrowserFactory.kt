@@ -1,14 +1,16 @@
 package ar.edu.unq.futapp.beans
 
-import org.openqa.selenium.remote.RemoteWebDriver
+import org.openqa.selenium.WebDriver
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.stereotype.Component
 
+@ConditionalOnBean(WebDriver::class)
 @Component
 class SeleniumWebBrowserFactory(
-    private val webDriverFactory: WebDriverFactory
+    private val webDriver: WebDriver
 ): WebBrowserFactory {
     override fun create(headless: Boolean): WebBrowser {
-        val driver = webDriverFactory.createDriver(headless)
-        return SeleniumWebBrowser(driver)
+        // Ignoramos headless: el WebDriver es una instancia singleton gestionada por Spring
+        return SeleniumWebBrowser(webDriver)
     }
 }
