@@ -10,9 +10,14 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 class TeamUrlExtractorTest {
     @Autowired
-    private lateinit var webBrowserFactory: JsoupWebBrowserFactory
+    private lateinit var webDriverFactory: WebBrowserFactory
     private lateinit var browser: WebBrowser
     private val extractor = TeamUrlExtractor()
+
+    @BeforeAll
+    fun setup() {
+        browser = webDriverFactory.create(headless = true)
+    }
 
     @AfterAll
     fun tearDown() {
@@ -24,20 +29,14 @@ class TeamUrlExtractorTest {
     fun whenPageHasResults_thenExtractsFirstTeamUrl() {
         val expectedURL = "https://es.whoscored.com/teams/889/show/argentina-boca-juniors"
 
-        browser = webBrowserFactory.createFromUri(TeamApiUtils.pageWithResultsUri())
-
         val actualURL = extractor.getFirstTeamUrl(browser, "Boca Juniors")
 
         Assertions.assertEquals(expectedURL, actualURL)
     }
 
-
-
     @Test
     @DisplayName("Throws EntityNotFound when the page has no results")
     fun whenPageHasNoResults_thenThrowsEntityNotFound() {
-        browser = webBrowserFactory.createFromUri(TeamApiUtils.pageWithoutResultsUri())
-
         Assertions.assertThrows(EntityNotFound::class.java) {
             extractor.getFirstTeamUrl(browser, "EquipoInexistente")
         }
