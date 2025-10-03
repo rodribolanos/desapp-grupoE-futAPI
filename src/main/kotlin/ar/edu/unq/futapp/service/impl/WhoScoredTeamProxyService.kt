@@ -1,4 +1,4 @@
-package ar.edu.unq.futapp.service
+package ar.edu.unq.futapp.service.impl
 
 import ar.edu.unq.futapp.exception.EntityNotFound
 import ar.edu.unq.futapp.exception.InternalServerException
@@ -6,6 +6,7 @@ import ar.edu.unq.futapp.model.Team
 import ar.edu.unq.futapp.beans.TeamPlayersExtractor
 import ar.edu.unq.futapp.beans.TeamUrlExtractor
 import ar.edu.unq.futapp.beans.WebBrowserFactory
+import ar.edu.unq.futapp.service.TeamApiClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*

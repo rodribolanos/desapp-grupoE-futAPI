@@ -8,8 +8,8 @@ import ar.edu.unq.futapp.exception.EntityNotFound
 import ar.edu.unq.futapp.exception.InternalServerException
 import ar.edu.unq.futapp.model.Player
 import ar.edu.unq.futapp.model.Team
+import ar.edu.unq.futapp.service.impl.WhoScoredTeamProxyService
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.AfterEach

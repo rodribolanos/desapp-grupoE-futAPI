@@ -4,7 +4,7 @@ import ar.edu.unq.futapp.dto.AuthResponseDTO
 import ar.edu.unq.futapp.dto.ExceptionDTO
 import ar.edu.unq.futapp.dto.PlayerDTO
 import ar.edu.unq.futapp.dto.toDTO
-import ar.edu.unq.futapp.service.TeamServiceImpl
+import ar.edu.unq.futapp.service.impl.TeamServiceImpl
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 @Validated
 @RestController
 @RequestMapping("/teams")
-class PlayerController {
+class TeamController {
     @Autowired
     private lateinit var teamService: TeamServiceImpl
 
