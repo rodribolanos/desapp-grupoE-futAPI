@@ -7,6 +7,7 @@ import ar.edu.unq.futapp.exception.UserAlreadyExistsException
 import ar.edu.unq.futapp.model.AuthRequest
 import ar.edu.unq.futapp.model.AuthResponse
 import ar.edu.unq.futapp.model.RefreshRequest
+import ar.edu.unq.futapp.service.impl.AuthServiceImpl
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
