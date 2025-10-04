@@ -39,7 +39,7 @@ class InitialSearchExtractorTest {
     }
 
     @Test
-    @DisplayName("Extract the first player URL when de page has results")
+    @DisplayName("Extract the first player URL when the page has results")
     fun whenPageHasResults_thenExtractsFirstPlayerUrl() {
         val expectedURL = "https://es.whoscored.com/players/134925/history/álvaro-madrid"
         browser = JsoupWebBrowser(TeamApiUtils.playerSearchPageWithResults())

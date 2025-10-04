@@ -38,6 +38,7 @@ class WhoScoredTeamProxyService @Autowired constructor(
     override fun findPlayerPerformance(playerName: String): Optional<PlayerPerformance> {
         val browser = webBrowserFactory.create(headless = true)
         try {
+
             val playerUrl = initialSearchExtractor.getFirstPlayerHistoryUrl(browser, playerName)
             val playerPerformance = playerPerformanceExtractor.getPlayerPerformanceFromUrl(browser, playerUrl)
             return Optional.of(playerPerformance)

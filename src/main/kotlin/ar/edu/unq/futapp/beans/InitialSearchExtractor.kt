@@ -8,12 +8,12 @@ import java.time.Duration
 
 @Component
 class InitialSearchExtractor {
-    fun buildSearchUri(teamName: String): URI {
+    fun buildSearchUri(searchParam: String): URI {
         return UriComponentsBuilder.newInstance()
             .scheme("https")
             .host("es.whoscored.com")
             .path("/search/")
-            .queryParam("t", teamName)
+            .queryParam("t", searchParam)
             .build()
             .toUri()
     }
@@ -47,20 +47,18 @@ class InitialSearchExtractor {
 
     private fun parseFirstPlayerUrlFromCurrentPage(browser: WebBrowser, playerName: String): String {
         if (browser.queryAll("span.search-message").isNotEmpty()) {
-            throw EntityNotFound("Player with name $playerName not found")
+            throw EntityNotFound("Player with name $playerName not found. Hubo search-message")
         }
-
         val playerTable = browser.queryAll(".search-result table")
             .firstOrNull { table ->
                 table.queryAll("tbody tr td a")
                     .any { it.attr("href")?.startsWith("/players/") == true }
-            } ?: throw EntityNotFound("Player with name $playerName not found")
+            } ?: throw EntityNotFound("Player with name $playerName not found. No hubo playerTable")
 
         val firstPlayerRow = playerTable.queryAll("tbody tr")
             .firstOrNull { row ->
                 row.queryAll("td a").any { it.attr("href")?.startsWith("/players/") == true }
-            } ?: throw EntityNotFound("Player with name $playerName not found")
-
+            } ?: throw EntityNotFound("Player with name $playerName not found. aca")
 
         val href = firstPlayerRow.queryAll("td a")
             .first { it.attr("href")?.startsWith("/players/") == true }
