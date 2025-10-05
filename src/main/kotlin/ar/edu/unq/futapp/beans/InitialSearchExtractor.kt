@@ -47,23 +47,22 @@ class InitialSearchExtractor {
 
     private fun parseFirstPlayerUrlFromCurrentPage(browser: WebBrowser, playerName: String): String {
         if (browser.queryAll("span.search-message").isNotEmpty()) {
-            throw EntityNotFound("Player with name $playerName not found. Hubo search-message")
+            throw EntityNotFound("Player with name $playerName not found.")
         }
-        val playerTable = browser.queryAll(".search-result table")
-            .firstOrNull { table ->
-                table.queryAll("tbody tr td a")
-                    .any { it.attr("href")?.startsWith("/players/") == true }
-            } ?: throw EntityNotFound("Player with name $playerName not found. No hubo playerTable")
 
-        val firstPlayerRow = playerTable.queryAll("tbody tr")
-            .firstOrNull { row ->
-                row.queryAll("td a").any { it.attr("href")?.startsWith("/players/") == true }
-            } ?: throw EntityNotFound("Player with name $playerName not found. aca")
+        val tables = browser.queryAll(".search-result table")
+        if (tables.isEmpty()) {
+            throw EntityNotFound("Player with name $playerName not found.")
+        }
 
-        val href = firstPlayerRow.queryAll("td a")
-            .first { it.attr("href")?.startsWith("/players/") == true }
-            .attr("href")!!
-            .replace("show", "history")
+        val playerTable = tables.firstOrNull { table ->
+            table.queryAll("a[href^='/players/']").isNotEmpty()
+        } ?: throw EntityNotFound("Player with name $playerName not found.")
+
+        var href = playerTable.queryAll("a[href^='/players/']").firstOrNull()!!.attr("href")
+            ?: throw EntityNotFound("Player with name $playerName not found.")
+
+        href = href.replace("show", "history")
 
         return if (href.startsWith("http")) href else "https://es.whoscored.com$href"
     }
