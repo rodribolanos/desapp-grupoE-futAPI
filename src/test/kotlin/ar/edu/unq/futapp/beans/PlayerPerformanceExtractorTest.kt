@@ -3,6 +3,7 @@ package ar.edu.unq.futapp.beans
 import ar.edu.unq.futapp.utils.PlayerApiUtils
 import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
+import kotlin.test.assertEquals
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -39,4 +40,21 @@ class PlayerPerformanceExtractorTest {
         assert(performance.seasons.isEmpty())
         assert(performance.name == "Álvaro Madrid")
     }
+
+    @Test
+    @DisplayName("Parses player performance with more than 7 seasons from player performance page")
+    fun whenValidBarcelonaPerformancePage_thenParsesPerformance() {
+        val expectedPerformance = PlayerApiUtils.playerPerformanceWith7SeasonsExpected()
+        val uri = PlayerApiUtils.playerPerformanceWith7SeasonsUri()
+        browser = JsoupWebBrowser(uri)
+        val performance = extractor.getPlayerPerformanceFromUrl(browser, uri.toString())
+
+        assertEquals(expectedPerformance.name, performance.name)
+        assertEquals(expectedPerformance.seasons.size, performance.seasons.size)
+        expectedPerformance.seasons.forEachIndexed { index, season ->
+            val parsedSeason = performance.seasons[index]
+            assertEquals(season, parsedSeason)
+        }
+    }
+
 }
