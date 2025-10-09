@@ -28,9 +28,13 @@ class PlayerPerformanceExtractor {
         return nameElement.text().trim()
     }
 
-    private fun extractedParticipations(rows: List<HtmlElement>): List<Performance> =
-        rows.filter { it.queryAll("td a.team-link").isNotEmpty() }
-            .map { extractedParticipation(it) }
+    private fun extractedParticipations(rows: List<HtmlElement>): List<Performance> {
+        val currentYear = java.time.LocalDate.now().year.toString()
+        return rows.filter { row ->
+            val season = extractSeason(row.queryAll("td"))
+            season.startsWith(currentYear) && row.queryAll("td a.team-link").isNotEmpty()
+        }.map { extractedParticipation(it) }
+    }
 
     private fun extractedParticipation(row: HtmlElement): Performance {
         val columns = row.queryAll("td")
