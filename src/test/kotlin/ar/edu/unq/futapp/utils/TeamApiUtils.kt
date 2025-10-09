@@ -11,8 +11,11 @@ object TeamApiUtils {
     // URI helpers
     fun playerListPageUri(): URI = File("$STATIC_PATH/player-list-page.html").toURI()
     fun malformedPlayerListPageUri(): URI = File("$STATIC_PATH/malformed-player-list-page.html").toURI()
-    fun pageWithResultsUri(): URI = File("$STATIC_PATH/page-with-results.html").toURI()
+    fun searchTeamWithResults(): URI = File("$STATIC_PATH/search-team-with-results.html").toURI()
     fun pageWithoutResultsUri(): URI = File("$STATIC_PATH/page-without-results.html").toURI()
+    fun playerSearchPageWithResults(): URI = File("$STATIC_PATH/search-player-with-results.html").toURI()
+    fun playerSearchPageWithoutResults(): URI = File("$STATIC_PATH/search-player-without-results.html").toURI()
+
 
     // Expected data for player-list-page.html
     fun expectedPlayersForPlayerListPage(): List<Player> = listOf(

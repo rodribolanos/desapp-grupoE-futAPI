@@ -1,9 +1,10 @@
-package ar.edu.unq.futapp.service
+package ar.edu.unq.futapp.service.impl
 
 import ar.edu.unq.futapp.exception.InvalidPasswordException
 import ar.edu.unq.futapp.exception.UserAlreadyExistsException
 import ar.edu.unq.futapp.model.User
 import ar.edu.unq.futapp.repository.UserRepository
+import ar.edu.unq.futapp.service.UserService
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder

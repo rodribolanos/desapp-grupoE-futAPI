@@ -1,4 +1,4 @@
-package ar.edu.unq.futapp.service
+package ar.edu.unq.futapp.service.impl
 
 import ar.edu.unq.futapp.beans.JwtUtil
 import ar.edu.unq.futapp.model.AuthRequest
@@ -6,6 +6,8 @@ import ar.edu.unq.futapp.model.AuthResponse
 import ar.edu.unq.futapp.model.RefreshRequest
 import ar.edu.unq.futapp.exception.InvalidCredentialsException
 import ar.edu.unq.futapp.exception.InvalidRefreshTokenException
+import ar.edu.unq.futapp.service.AuthService
+import ar.edu.unq.futapp.service.UserService
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.AuthenticationException
