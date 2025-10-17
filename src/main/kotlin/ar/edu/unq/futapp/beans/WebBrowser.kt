@@ -8,5 +8,4 @@ interface WebBrowser {
     fun waitFor(selector: String, timeout: Duration = Duration.ofSeconds(15)): Boolean
     fun queryAll(selector: String): List<HtmlElement>
     fun close()
-
 }

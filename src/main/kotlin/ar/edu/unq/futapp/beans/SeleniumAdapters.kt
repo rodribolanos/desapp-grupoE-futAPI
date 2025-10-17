@@ -33,7 +33,7 @@ class SeleniumWebBrowser(private val driver: WebDriver) : WebBrowser {
 
 class SeleniumHtmlElement(private val element: WebElement) : HtmlElement {
     override fun tag(): String = element.tagName
-    override fun text(): String = element.text
+    override fun text(): String = attr("innerHTML").toString()
     override fun attr(name: String): String? = element.getAttribute(name)
     override fun queryAll(selector: String): List<HtmlElement> =
         element.findElements(By.cssSelector(selector)).map { SeleniumHtmlElement(it) }
