@@ -5,28 +5,15 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:8080"
-    },
-    {
-      "key": "accessToken",
-      "value": ""
-    },
-    {
-      "key": "refreshToken",
-      "value": ""
-    }
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "teamName", "value": "Boca Juniors" },
+    { "key": "playerName", "value": "Lionel Messi" }
   ],
   "auth": {
     "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{accessToken}}",
-        "type": "string"
-      }
-    ]
+    "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ]
   },
   "item": [
     {
@@ -40,10 +27,10 @@
               "script": {
                 "exec": [
                   "if (pm.response.code === 201) {",
-                  "    const response = pm.response.json();",
-                  "    pm.collectionVariables.set('accessToken', response.accessToken);",
-                  "    pm.collectionVariables.set('refreshToken', response.refreshToken);",
-                  "    console.log('Tokens saved successfully');",
+                  "  const response = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', response.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', response.refreshToken);",
+                  "  console.log('Tokens saved successfully');",
                   "}"
                 ]
               }
@@ -51,21 +38,9 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "register"]
-            },
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth","register"] },
             "description": "Registra un nuevo usuario en el sistema"
           },
           "response": []
@@ -78,10 +53,10 @@
               "script": {
                 "exec": [
                   "if (pm.response.code === 200) {",
-                  "    const response = pm.response.json();",
-                  "    pm.collectionVariables.set('accessToken', response.accessToken);",
-                  "    pm.collectionVariables.set('refreshToken', response.refreshToken);",
-                  "    console.log('Tokens saved successfully');",
+                  "  const response = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', response.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', response.refreshToken);",
+                  "  console.log('Tokens saved successfully');",
                   "}"
                 ]
               }
@@ -89,21 +64,9 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
-            },
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] },
             "description": "Autentica un usuario existente"
           },
           "response": []
@@ -116,214 +79,160 @@
               "script": {
                 "exec": [
                   "if (pm.response.code === 200) {",
-                  "    const response = pm.response.json();",
-                  "    pm.collectionVariables.set('accessToken', response.accessToken);",
-                  "    pm.collectionVariables.set('refreshToken', response.refreshToken);",
-                  "    console.log('Tokens refreshed successfully');",
+                  "  const response = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', response.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', response.refreshToken);",
+                  "  console.log('Tokens refreshed successfully');",
                   "}"
                 ]
               }
             }
           ],
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
+            "auth": { "type": "noauth" },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/refresh",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "refresh"]
-            },
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/refresh", "host": ["{{baseUrl}}"], "path": ["auth","refresh"] },
             "description": "Renueva el access token usando el refresh token"
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Invalid Credentials (400)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"wrong\",\n  \"password\": \"wrong\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] },
+            "description": "Prueba de inicio de sesión con credenciales inválidas"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh - Invalid Token (400)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"invalid-token\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/refresh", "host": ["{{baseUrl}}"], "path": ["auth","refresh"] },
+            "description": "Prueba de actualización con token inválido"
           },
           "response": []
         }
       ]
     },
     {
-      "name": "Teams & Players",
+      "name": "Teams",
       "item": [
         {
           "name": "Get Team Players",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
+            "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
             "url": {
               "raw": "{{baseUrl}}/teams/{{teamName}}/players",
               "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamName}}", "players"],
-              "variable": [
-                {
-                  "key": "teamName",
-                  "value": "River Plate",
-                  "description": "Nombre del equipo"
-                }
-              ]
+              "path": ["teams","{{teamName}}","players"]
             },
-            "description": "Obtiene la lista de jugadores de un equipo específico desde WhoScored"
+            "description": "Obtiene la lista de jugadores de un equipo específico"
           },
           "response": []
         },
         {
-          "name": "Get Team Players - Boca Juniors",
+          "name": "Get Team Players - Team Not Found (404)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/teams/Boca Juniors/players",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "Boca Juniors", "players"]
-            },
-            "description": "Ejemplo específico para Boca Juniors"
+            "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+            "url": { "raw": "{{baseUrl}}/teams/EquipoInexistente/players", "host": ["{{baseUrl}}"], "path": ["teams","EquipoInexistente","players"] },
+            "description": "Prueba con un equipo que no existe"
           },
           "response": []
         },
         {
-          "name": "Get Team Players - Real Madrid",
+          "name": "Get Team Players - Unauthorized (403)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/teams/{{teamName}}/players", "host": ["{{baseUrl}}"], "path": ["teams","{{teamName}}","players"] },
+            "description": "Prueba sin autorización"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Upcoming Fixtures",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
+            "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
             "url": {
-              "raw": "{{baseUrl}}/teams/Real Madrid/players",
+              "raw": "{{baseUrl}}/teams/{{teamName}}/fixtures/upcoming",
               "host": ["{{baseUrl}}"],
-              "path": ["teams", "Real Madrid", "players"]
+              "path": ["teams","{{teamName}}","fixtures","upcoming"]
             },
-            "description": "Ejemplo específico para Real Madrid"
+            "description": "Obtiene los próximos partidos de un equipo"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Upcoming Fixtures - Team Not Found (404)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+            "url": { "raw": "{{baseUrl}}/teams/EquipoInexistente/fixtures/upcoming", "host": ["{{baseUrl}}"], "path": ["teams","EquipoInexistente","fixtures","upcoming"] },
+            "description": "Prueba de próximos partidos con un equipo que no existe"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Upcoming Fixtures - Unauthorized (403)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/teams/{{teamName}}/fixtures/upcoming", "host": ["{{baseUrl}}"], "path": ["teams","{{teamName}}","fixtures","upcoming"] },
+            "description": "Prueba de próximos partidos sin autorización"
           },
           "response": []
         }
       ]
     },
     {
-      "name": "Error Testing",
+      "name": "Players",
       "item": [
         {
-          "name": "Invalid Credentials",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"wronguser\",\n  \"password\": \"wrongpassword\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
-            },
-            "description": "Test de credenciales inválidas - debería devolver 400"
-          },
-          "response": []
-        },
-        {
-          "name": "Invalid Refresh Token",
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"refreshToken\": \"invalid-token\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/refresh",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "refresh"]
-            },
-            "description": "Test de refresh token inválido - debería devolver 401"
-          },
-          "response": []
-        },
-        {
-          "name": "Team Not Found",
+          "name": "Get Player Performance",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
+            "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
             "url": {
-              "raw": "{{baseUrl}}/teams/NonExistentTeam/players",
+              "raw": "{{baseUrl}}/players/{{playerName}}/performance",
               "host": ["{{baseUrl}}"],
-              "path": ["teams", "NonExistentTeam", "players"]
+              "path": ["players","{{playerName}}","performance"]
             },
-            "description": "Test de equipo inexistente - debería devolver 404"
+            "description": "Obtiene el rendimiento de un jugador específico"
           },
           "response": []
         },
         {
-          "name": "Unauthorized Access",
+          "name": "Get Player Performance - Player Not Found (404)",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+            "url": { "raw": "{{baseUrl}}/players/JugadorInexistente/performance", "host": ["{{baseUrl}}"], "path": ["players","JugadorInexistente","performance"] },
+            "description": "Prueba de rendimiento de un jugador que no existe"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Player Performance - Unauthorized (403)",
+          "request": {
+            "auth": { "type": "noauth" },
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/teams/River Plate/players",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "River Plate", "players"]
-            },
-            "description": "Test sin token de autorización - debería devolver 403"
-          },
-          "response": []
-        },
-        {
-          "name": "Not Found Resource",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/nonexistent/endpoint",
-              "host": ["{{baseUrl}}"],
-              "path": ["nonexistent", "endpoint"]
-            },
-            "description": "Test de endpoint inexistente - debería devolver 404"
+            "url": { "raw": "{{baseUrl}}/players/{{playerName}}/performance", "host": ["{{baseUrl}}"], "path": ["players","{{playerName}}","performance"] },
+            "description": "Prueba de rendimiento sin autorización"
           },
           "response": []
         }
@@ -331,4 +240,3 @@
     }
   ]
 }
-

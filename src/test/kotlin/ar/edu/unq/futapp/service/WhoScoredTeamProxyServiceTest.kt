@@ -20,12 +20,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @SpringBootTest
-class WhoScoredTeamProxyServiceTest {
-    @Autowired
+class WhoScoredTeamProxyServiceTest() {
     private lateinit var playerPerformanceExtractor: PlayerPerformanceExtractor
     private lateinit var initialSearchExtractor: InitialSearchExtractor
     private lateinit var teamPlayersExtractor: TeamPlayersExtractor
     private lateinit var webBrowserFactory: WebBrowserFactory
+    private lateinit var teamFixturesExtractor: TeamFixturesExtractor
 
     @Autowired
     private lateinit var service: WhoScoredTeamProxyService
@@ -39,7 +39,8 @@ class WhoScoredTeamProxyServiceTest {
         initialSearchExtractor = mockk<InitialSearchExtractor>()
         webBrowserFactory = mockk<WebBrowserFactory>()
         playerPerformanceExtractor = mockk<PlayerPerformanceExtractor>()
-        service = WhoScoredTeamProxyService(initialSearchExtractor, teamPlayersExtractor, webBrowserFactory, playerPerformanceExtractor)
+        teamFixturesExtractor = mockk<TeamFixturesExtractor>()
+        service = WhoScoredTeamProxyService(initialSearchExtractor, teamPlayersExtractor, webBrowserFactory, playerPerformanceExtractor, teamFixturesExtractor)
     }
 
     @AfterEach

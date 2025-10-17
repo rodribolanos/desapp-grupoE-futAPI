@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Malformed Team Fixtures</title></head>
+<body>
+  <!-- Intencionalmente incluye el wrapper y una fila sin la fecha ni resultado para forzar ParsingException -->
+  <div id="team-fixture-wrapper">
+    <div class="divtable-row">
+      <div class="tournament divtable-data"><a class="tournament-link" href="#">ALP</a></div>
+      <div class="stacked-teams-display divtable-data">
+        <div class="team"><a class="team-link" href="#">Equipo A</a></div>
+        <div class="team"><a class="team-link" href="#">Equipo B</a></div>
+      </div>
+      <!-- Falta .date.divtable-data y .result/.score-placeholder -->
+    </div>
+  </div>
+</body>
+</html>
+
