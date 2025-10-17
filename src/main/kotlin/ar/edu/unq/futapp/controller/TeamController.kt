@@ -3,6 +3,7 @@ package ar.edu.unq.futapp.controller
 import ar.edu.unq.futapp.dto.AuthResponseDTO
 import ar.edu.unq.futapp.dto.ExceptionDTO
 import ar.edu.unq.futapp.dto.PlayerDTO
+import ar.edu.unq.futapp.dto.UpcomingMatchDTO
 import ar.edu.unq.futapp.dto.toDTO
 import ar.edu.unq.futapp.service.impl.TeamServiceImpl
 import io.swagger.v3.oas.annotations.Operation
@@ -57,5 +58,38 @@ class TeamController {
         teamName: String
     ): ResponseEntity<List<PlayerDTO>> {
         return ResponseEntity.ok(teamService.findPlayersByTeam(teamName).toDTO())
+    }
+
+    @Operation(summary = "Get upcoming fixtures for a team",
+        description = "Returns upcoming (not yet played) fixtures for the specified team.",
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved upcoming fixtures",
+                content = [Content(schema = Schema(implementation = UpcomingMatchDTO::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Team not found",
+                content = [Content(schema = Schema(implementation = ExceptionDTO::class))]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Parsing exception",
+                content = [Content(schema = Schema(implementation = ExceptionDTO::class))]
+            )
+        ]
+    )
+    @GetMapping("/{teamName}/fixtures/upcoming")
+    fun upcomingFixtures(
+        @PathVariable("teamName")
+        @NotBlank(message = "teamName must not be empty or null")
+        teamName: String
+    ): ResponseEntity<List<UpcomingMatchDTO>> {
+        val matches = teamService.findUpcomingFixturesByTeam(teamName)
+        return ResponseEntity.ok(matches.toDTO())
     }
 }

@@ -3,6 +3,7 @@ package ar.edu.unq.futapp.service.impl
 import ar.edu.unq.futapp.exception.EntityNotFound
 import ar.edu.unq.futapp.model.Player
 import ar.edu.unq.futapp.model.Team
+import ar.edu.unq.futapp.model.UpcomingMatch
 import ar.edu.unq.futapp.service.WhoScoredApiClient
 import ar.edu.unq.futapp.service.TeamService
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,5 +16,11 @@ class TeamServiceImpl @Autowired constructor(val teamApiClient: WhoScoredApiClie
         val team: Optional<Team> = teamApiClient.findTeam(teamName)
         if(team.isEmpty) throw EntityNotFound("Team with name $teamName not found")
         return team.get().players
+    }
+
+    override fun findUpcomingFixturesByTeam(teamName: String): List<UpcomingMatch> {
+        val matchesOpt = teamApiClient.findUpcomingFixtures(teamName)
+        if (matchesOpt.isEmpty) throw EntityNotFound("Team with name $teamName not found")
+        return matchesOpt.get()
     }
 }

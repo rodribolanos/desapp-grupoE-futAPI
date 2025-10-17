@@ -15,6 +15,9 @@ object TeamApiUtils {
     fun pageWithoutResultsUri(): URI = File("$STATIC_PATH/page-without-results.html").toURI()
     fun playerSearchPageWithResults(): URI = File("$STATIC_PATH/search-player-with-results.html").toURI()
     fun playerSearchPageWithoutResults(): URI = File("$STATIC_PATH/search-player-without-results.html").toURI()
+    // NUEVO: fixtures
+    fun teamFixturesPageUri(): URI = File("$STATIC_PATH/team-fixtures-page.html").toURI()
+    fun malformedTeamFixturesPageUri(): URI = File("$STATIC_PATH/malformed-team-fixtures-page.html").toURI()
 
 
     // Expected data for player-list-page.html
