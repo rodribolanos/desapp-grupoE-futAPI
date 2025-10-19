@@ -3,8 +3,11 @@ package ar.edu.unq.futapp.beans
 import ar.edu.unq.futapp.exception.ParsingException
 import ar.edu.unq.futapp.model.UpcomingMatch
 import ar.edu.unq.futapp.utils.TeamApiUtils
+import io.mockk.every
+import io.mockk.mockkStatic
 import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
+import java.time.LocalDate
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -20,6 +23,9 @@ class TeamFixturesExtractorTest {
     @Test
     @DisplayName("Parses upcoming fixtures from team fixtures page")
     fun whenValidTeamFixturesPage_thenParsesUpcomingFixtures() {
+        mockkStatic(LocalDate::class)
+        every { LocalDate.now() } returns LocalDate.of(2025, 10, 17)
+
         val uri = TeamApiUtils.teamFixturesPageUri()
         browser = JsoupWebBrowser(uri)
 
