@@ -3,15 +3,12 @@ package ar.edu.unq.futapp.service.impl
 import ar.edu.unq.futapp.beans.*
 import ar.edu.unq.futapp.exception.EntityNotFound
 import ar.edu.unq.futapp.exception.InternalServerException
-import ar.edu.unq.futapp.model.Team
-import ar.edu.unq.futapp.model.Match
 import ar.edu.unq.futapp.beans.TeamPlayersExtractor
 import ar.edu.unq.futapp.beans.InitialSearchExtractor
 import ar.edu.unq.futapp.beans.PlayerPerformanceExtractor
 import ar.edu.unq.futapp.beans.TeamFixturesExtractor
 import ar.edu.unq.futapp.beans.WebBrowserFactory
-import ar.edu.unq.futapp.model.PlayerPerformance
-import ar.edu.unq.futapp.model.UpcomingMatch
+import ar.edu.unq.futapp.model.*
 import ar.edu.unq.futapp.service.WhoScoredApiClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -72,12 +69,12 @@ class WhoScoredTeamProxyService @Autowired constructor(
         }
     }
 
-    override fun findLastMatchesFromTeam(teamName: String): List<Match> {
+    override fun findLastMatchesFromTeam(teamName: String): TeamMatches {
         val browser = webBrowserFactory.create(headless = true)
         try {
             val teamUrl = initialSearchExtractor.getFirstTeamUrl(browser, teamName).replace("show", "fixtures")
-            val matches = lastMatchesExtractor.getLastMatchesFromUrl(browser, teamUrl)
-            return matches
+            val teamMatches = lastMatchesExtractor.getLastMatchesFromUrl(browser, teamUrl)
+            return teamMatches
         } catch (e: EntityNotFound) {
             throw e
         } catch (e: Exception) {

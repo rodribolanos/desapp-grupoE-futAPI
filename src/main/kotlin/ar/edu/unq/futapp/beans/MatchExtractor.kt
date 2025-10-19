@@ -3,6 +3,7 @@ package ar.edu.unq.futapp.beans
 import ar.edu.unq.futapp.model.HtmlElement
 import ar.edu.unq.futapp.model.Match
 import ar.edu.unq.futapp.exception.ParsingException
+import ar.edu.unq.futapp.model.TeamMatches
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.LocalDate
@@ -13,7 +14,7 @@ class MatchExtractor(
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yy")
 ) {
 
-    fun getLastMatchesFromUrl(browser: WebBrowser, url: String): List<Match> {
+    fun getLastMatchesFromUrl(browser: WebBrowser, url: String): TeamMatches {
         browser.goTo(url)
 
         browser.waitFor(
@@ -23,7 +24,12 @@ class MatchExtractor(
         val teamName = extractTeamNameFromPage(browser)
 
         val matchRows = browser.queryAll("#team-fixtures .divtable-row[data-id]")
-        return extractMatches(matchRows, teamName)
+        val matches = extractMatches(matchRows, teamName)
+
+        return TeamMatches(
+            teamName = teamName,
+            matches = matches
+        )
     }
 
     private fun extractTeamNameFromPage(browser: WebBrowser): String {

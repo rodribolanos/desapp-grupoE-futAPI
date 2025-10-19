@@ -29,12 +29,12 @@ class MatchExtractorTest {
         val uri = MatchApiUtils.barcelonaFixturesPageUri()
         browser = JsoupWebBrowser(uri)
 
-        val matches = scraper.getLastMatchesFromUrl(browser, uri.toString())
+        val teamMatches = scraper.getLastMatchesFromUrl(browser, uri.toString())
 
-        assertEquals(expectedMatches.size, matches.size, "Should parse correct number of matches")
+        assertEquals(expectedMatches.size, teamMatches.matches.size, "Should parse correct number of matches")
 
         expectedMatches.forEachIndexed { index, expected ->
-            val actual = matches[index]
+            val actual = teamMatches.matches[index]
             assertMatchEquals(expected, actual, "Match at index $index")
         }
     }
@@ -45,11 +45,11 @@ class MatchExtractorTest {
         val uri = MatchApiUtils.barcelonaFixturesPageUri()
         browser = JsoupWebBrowser(uri)
 
-        val matches = scraper.getLastMatchesFromUrl(browser, uri.toString())
+        val teamMatches = scraper.getLastMatchesFromUrl(browser, uri.toString())
 
-        assertTrue(matches.isNotEmpty(), "Should have matches")
+        assertTrue(teamMatches.matches.isNotEmpty(), "Should have matches")
 
-        val firstMatch = matches[0]
+        val firstMatch = teamMatches.matches[0]
         assertEquals("Mallorca", firstMatch.homeTeam)
         assertEquals("Barcelona", firstMatch.awayTeam)
     }
@@ -60,9 +60,9 @@ class MatchExtractorTest {
         val uri = MatchApiUtils.barcelonaFixturesPageUri()
         browser = JsoupWebBrowser(uri)
 
-        val matches = scraper.getLastMatchesFromUrl(browser, uri.toString())
+        val teamMatches = scraper.getLastMatchesFromUrl(browser, uri.toString())
 
-        val firstMatch = matches[0] // Mallorca 0-3 Barcelona
+        val firstMatch = teamMatches.matches[0] // Mallorca 0-3 Barcelona
         assertEquals(0, firstMatch.homeScore)
         assertEquals(3, firstMatch.awayScore)
     }
@@ -73,12 +73,12 @@ class MatchExtractorTest {
         val uri = MatchApiUtils.barcelonaFixturesPageUri()
         browser = JsoupWebBrowser(uri)
 
-        val matches = scraper.getLastMatchesFromUrl(browser, uri.toString())
+        val teamMatches = scraper.getLastMatchesFromUrl(browser, uri.toString())
 
-        val awayMatch = matches[0] // Mallorca vs Barcelona (away)
+        val awayMatch = teamMatches.matches[0] // Mallorca vs Barcelona (away)
         assertFalse(awayMatch.isHomeMatch, "Mallorca vs Barcelona should be away match")
 
-        val homeMatch = matches.first { it.homeTeam == "Barcelona" }
+        val homeMatch = teamMatches.matches.first { it.homeTeam == "Barcelona" }
         assertTrue(homeMatch.isHomeMatch, "Barcelona vs X should be home match")
     }
 
@@ -88,9 +88,9 @@ class MatchExtractorTest {
         val uri = MatchApiUtils.barcelonaFixturesPageUri()
         browser = JsoupWebBrowser(uri)
 
-        val matches = scraper.getLastMatchesFromUrl(browser, uri.toString())
+        val teamMatches = scraper.getLastMatchesFromUrl(browser, uri.toString())
 
-        val firstMatch = matches[0]
+        val firstMatch = teamMatches.matches[0]
         assertEquals(LocalDate.of(2025, 8, 16), firstMatch.date)
     }
 
@@ -101,9 +101,10 @@ class MatchExtractorTest {
         browser = JsoupWebBrowser(uri)
 
         // Act
-        val matches = scraper.getLastMatchesFromUrl(browser, uri.toString())
+        val teamMatches = scraper.getLastMatchesFromUrl(browser, uri.toString())
+        val matches = teamMatches.matches
 
-        matches.forEach { match ->
+        matches.forEach{ match ->
             assertTrue(
                 match.homeScore >= 0 && match.awayScore >= 0,
                 "Match ${match.homeTeam} vs ${match.awayTeam} should have valid scores"
@@ -117,7 +118,8 @@ class MatchExtractorTest {
         val uri = MatchApiUtils.barcelonaFixturesPageUri()
         browser = JsoupWebBrowser(uri)
 
-        val matches = scraper.getLastMatchesFromUrl(browser, uri.toString())
+        val teamMatches = scraper.getLastMatchesFromUrl(browser, uri.toString())
+        val matches = teamMatches.matches
 
         val wins = matches.count { match ->
             (match.isHomeMatch && match.homeScore > match.awayScore) || (!match.isHomeMatch && match.awayScore > match.homeScore)
