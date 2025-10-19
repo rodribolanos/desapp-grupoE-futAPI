@@ -389,6 +389,7 @@ class StatisticalCalculatorTest {
                 .build()  // LOSS
         )
 
+        // Scenario 2: Wins are older, losses are recent
         val matchesOldWins = listOf(
             // últimos 5 partidos: L L L W W
             MatchBuilder()
