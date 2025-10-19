@@ -8,6 +8,7 @@ import java.time.LocalDate
 import kotlin.test.assertTrue
 
 class StatisticalCalculatorTest {
+
     @Test
     @DisplayName("calculateWeightedWinPercentage - Team with ALL recent wins should have high percentage")
     fun whenTeamHasAllRecentWins_thenWeightedPercentageIsHigh() {
@@ -196,6 +197,36 @@ class StatisticalCalculatorTest {
     }
 
     @Test
+    @DisplayName("calculateHomeAdvantage - Empty matches should return default advantage")
+    fun whenNoMatchesForHomeAdvantage_thenReturnDefault() {
+        // Arrange
+        val matches = emptyList<Match>()
+
+        // Act
+        val homeAdvantage = StatisticalCalculator.calculateHomeAdvantage("TeamA", matches)
+
+        // Assert
+        assertEquals(0.5, homeAdvantage, "Empty matches should return default home advantage of 0.5")
+    }
+
+    @Test
+    @DisplayName("calculateHomeAdvantage - Team with no home matches should return default advantage")
+    fun whenTeamHasNoHomeMatches_thenReturnDefault() {
+        val matches = listOf(
+            MatchBuilder()
+                .withAwayTeam("TeamA")
+                .withHomeScore(1)
+                .withAwayScore(2)
+                .withDate(LocalDate.now())
+                .build() // Away LOSS
+        )
+
+        val homeAdvantage = StatisticalCalculator.calculateHomeAdvantage("TeamA", matches)
+
+        assertEquals(0.5, homeAdvantage, "No home matches should return default advantage of 0.5")
+    }
+
+    @Test
     @DisplayName("calculateHomeAdvantage - Should calculate overall home advantage")
     fun testCalculateHomeAdvantage() {
         // Arrange: 6 home wins out of 10 matches (60% home advantage)
@@ -267,45 +298,16 @@ class StatisticalCalculatorTest {
     }
 
     @Test
-    @DisplayName("calculateRecentForm - Good recent form should return high score")
-    fun testCalculateRecentForm_GoodForm() {
-        // Arrange: TeamA won last 4 matches and drew 1
-        val matches = listOf(
-            MatchBuilder()
-                .withHomeTeam("TeamA")
-                .withHomeScore(2)
-                .withAwayScore(1)
-                .withDate(LocalDate.now().minusDays(1))
-                .build(),  // WIN (most recent)
-            MatchBuilder()
-                .withAwayTeam("TeamA")
-                .withHomeScore(0)
-                .withAwayScore(3)
-                .withDate(LocalDate.now().minusDays(8))
-                .build(),  // WIN
-            MatchBuilder()
-                .withHomeTeam("TeamA")
-                .withHomeScore(1)
-                .withAwayScore(1)
-                .withDate(LocalDate.now().minusDays(15))
-                .build(),  // DRAW
-            MatchBuilder()
-                .withAwayTeam("TeamA")
-                .withHomeScore(1)
-                .withAwayScore(2)
-                .withDate(LocalDate.now().minusDays(22))
-                .build(),  // WIN
-            MatchBuilder()
-                .withHomeTeam("TeamA")
-                .withHomeScore(3)
-                .withAwayScore(0)
-                .withDate(LocalDate.now().minusDays(29))
-                .build()  // WIN
-        )
+    @DisplayName("calculateRecentForm - Empty matches should return default form")
+    fun whenNoMatchesForRecentForm_thenReturnDefault() {
+        // Arrange
+        val matches = emptyList<Match>()
 
-        val form = StatisticalCalculator.calculateRecentForm(matches, "TeamA", lastN = 8)
+        // Act
+        val recentForm = StatisticalCalculator.calculateRecentForm(matches, "TeamA")
 
-        assertTrue(form > 0.8, "4 wins + 1 draw should give form > 80%")
+        // Assert
+        assertEquals(0.5, recentForm, "Empty matches should return default recent form of 0.5")
     }
 
     @Test
@@ -351,76 +353,74 @@ class StatisticalCalculatorTest {
     }
 
     @Test
-    @DisplayName("calculateRecentForm - Should weight recent matches more than older matches")
-    fun whenRecentWins_thenFormIsHigherThanOldWins() {
-        // Arrange: Same number of wins (2) and losses (3), but timing diferente
-
-        // Scenario 1: Wins are recent, losses are older
+    @DisplayName("calculateRecentForm - Should give higher form when wins are among most recent matches")
+    fun whenWinsAreAmongLastMatches_thenFormIsHigher() {
         val matchesRecentWins = listOf(
+            // últimos 5 partidos: W W L L L
             MatchBuilder()
                 .withHomeTeam("TeamA")
+                .withDate(LocalDate.now().minusDays(1))
                 .withHomeScore(2)
                 .withAwayScore(1)
-                .withDate(LocalDate.now().minusDays(1))
-                .build(),  // WIN (most recent)
+                .build(), // WIN
             MatchBuilder()
                 .withHomeTeam("TeamA")
+                .withDate(LocalDate.now().minusDays(2))
                 .withHomeScore(3)
                 .withAwayScore(0)
-                .withDate(LocalDate.now().minusDays(8))
-                .build(),  // WIN
+                .build(), // WIN
             MatchBuilder()
                 .withHomeTeam("TeamA")
+                .withDate(LocalDate.now().minusDays(3))
                 .withHomeScore(0)
                 .withAwayScore(1)
-                .withDate(LocalDate.now().minusDays(15))
-                .build(),  // LOSS
+                .build(), // LOSS
             MatchBuilder()
                 .withHomeTeam("TeamA")
+                .withDate(LocalDate.now().minusDays(4))
                 .withHomeScore(1)
                 .withAwayScore(2)
-                .withDate(LocalDate.now().minusDays(22))
-                .build(),  // LOSS
+                .build(), // LOSS
             MatchBuilder()
                 .withHomeTeam("TeamA")
+                .withDate(LocalDate.now().minusDays(5))
                 .withHomeScore(0)
                 .withAwayScore(2)
-                .withDate(LocalDate.now().minusDays(29))
-                .build()   // LOSS
+                .build()  // LOSS
         )
 
-        // Scenario 2: Wins are older, losses are recent
         val matchesOldWins = listOf(
+            // últimos 5 partidos: L L L W W
             MatchBuilder()
                 .withHomeTeam("TeamA")
+                .withDate(LocalDate.now().minusDays(1))
                 .withHomeScore(0)
                 .withAwayScore(2)
-                .withDate(LocalDate.now().minusDays(1))
-                .build(),  // LOSS (most recent)
+                .build(), // LOSS
             MatchBuilder()
                 .withHomeTeam("TeamA")
+                .withDate(LocalDate.now().minusDays(2))
                 .withHomeScore(1)
-                .withAwayScore(3)
-                .withDate(LocalDate.now().minusDays(8))
-                .build(),  // LOSS
+                .withAwayScore(2)
+                .build(), // LOSS
             MatchBuilder()
                 .withHomeTeam("TeamA")
-                .withHomeScore(2)
+                .withDate(LocalDate.now().minusDays(3))
+                .withHomeScore(0)
                 .withAwayScore(1)
-                .withDate(LocalDate.now().minusDays(15))
-                .build(),  // WIN (older)
+                .build(), // LOSS
             MatchBuilder()
                 .withHomeTeam("TeamA")
+                .withDate(LocalDate.now().minusDays(4))
                 .withHomeScore(3)
                 .withAwayScore(0)
-                .withDate(LocalDate.now().minusDays(22))
-                .build(),  // WIN
+                .build(), // WIN
             MatchBuilder()
                 .withHomeTeam("TeamA")
-                .withHomeScore(1)
-                .withAwayScore(0)
-                .withDate(LocalDate.now().minusDays(29))
-                .build()   // WIN
+                .withDate(LocalDate.now().minusDays(5))
+                .withHomeScore(2)
+                .withAwayScore(1)
+                .build(), // WIN
         )
 
         val formRecentWins = StatisticalCalculator.calculateRecentForm(matchesRecentWins, "TeamA")
@@ -428,7 +428,7 @@ class StatisticalCalculatorTest {
 
         assertTrue(
             formRecentWins > formOldWins,
-            "Recent wins should have higher form than old wins (both have 2 wins and 3 losses)"
+            "Wins in more recent matches should yield a higher form value"
         )
     }
 

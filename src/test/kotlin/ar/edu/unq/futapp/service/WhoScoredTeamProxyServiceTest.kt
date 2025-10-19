@@ -25,6 +25,7 @@ class WhoScoredTeamProxyServiceTest() {
     private lateinit var initialSearchExtractor: InitialSearchExtractor
     private lateinit var teamPlayersExtractor: TeamPlayersExtractor
     private lateinit var webBrowserFactory: WebBrowserFactory
+    private lateinit var matchExtractor: MatchExtractor
     private lateinit var teamFixturesExtractor: TeamFixturesExtractor
 
     @Autowired
@@ -39,8 +40,9 @@ class WhoScoredTeamProxyServiceTest() {
         initialSearchExtractor = mockk<InitialSearchExtractor>()
         webBrowserFactory = mockk<WebBrowserFactory>()
         playerPerformanceExtractor = mockk<PlayerPerformanceExtractor>()
+        matchExtractor = mockk<MatchExtractor>()
         teamFixturesExtractor = mockk<TeamFixturesExtractor>()
-        service = WhoScoredTeamProxyService(initialSearchExtractor, teamPlayersExtractor, webBrowserFactory, playerPerformanceExtractor, teamFixturesExtractor)
+        service = WhoScoredTeamProxyService(initialSearchExtractor, teamPlayersExtractor, webBrowserFactory, playerPerformanceExtractor, matchExtractor, teamFixturesExtractor)
     }
 
     @AfterEach
