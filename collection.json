@@ -9,7 +9,9 @@
     { "key": "accessToken", "value": "" },
     { "key": "refreshToken", "value": "" },
     { "key": "teamName", "value": "Boca Juniors" },
-    { "key": "playerName", "value": "Lionel Messi" }
+    { "key": "playerName", "value": "Lionel Messi" },
+    { "key": "page", "value": "0" },
+    { "key": "size", "value": "10" }
   ],
   "auth": {
     "type": "bearer",
@@ -39,7 +41,7 @@
           "request": {
             "method": "POST",
             "header": [ { "key": "Content-Type", "value": "application/json" } ],
-            "body": { "mode": "raw", "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"passworD.123\"\n}" },
             "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth","register"] },
             "description": "Registra un nuevo usuario en el sistema"
           },
@@ -65,7 +67,7 @@
           "request": {
             "method": "POST",
             "header": [ { "key": "Content-Type", "value": "application/json" } ],
-            "body": { "mode": "raw", "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"passworD.123\"\n}" },
             "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] },
             "description": "Autentica un usuario existente"
           },
@@ -233,6 +235,66 @@
             "header": [],
             "url": { "raw": "{{baseUrl}}/players/{{playerName}}/performance", "host": ["{{baseUrl}}"], "path": ["players","{{playerName}}","performance"] },
             "description": "Prueba de rendimiento sin autorización"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Audit",
+      "item": [
+        {
+          "name": "Get My History",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+            "url": {
+              "raw": "{{baseUrl}}/me/history?page={{page}}&size={{size}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["me","history"],
+              "query": [
+                { "key": "page", "value": "{{page}}" },
+                { "key": "size", "value": "{{size}}" }
+              ]
+            },
+            "description": "Historial paginado del usuario autenticado"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My History - Unauthorized (401)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/me/history?page={{page}}&size={{size}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["me","history"],
+              "query": [
+                { "key": "page", "value": "{{page}}" },
+                { "key": "size", "value": "{{size}}" }
+              ]
+            },
+            "description": "Prueba sin autenticación (401)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My History - Invalid Size (400)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+            "url": {
+              "raw": "{{baseUrl}}/me/history?page={{page}}&size=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["me","history"],
+              "query": [
+                { "key": "page", "value": "{{page}}" },
+                { "key": "size", "value": "0" }
+              ]
+            },
+            "description": "Prueba de validación con size <= 0 (400)"
           },
           "response": []
         }

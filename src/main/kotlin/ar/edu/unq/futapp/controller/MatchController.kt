@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/match")
-class MatchController(
-    @Autowired private val matchService: MatchService
+class MatchController @Autowired constructor(
+    private val matchService: MatchService
 ) {
 
     @Operation(summary = "Predict the outcome of a match between two teams")
@@ -30,7 +30,7 @@ class MatchController(
     )
     @GetMapping("/{homeTeam}/{awayTeam}/prediction")
     fun predictMatch(@PathVariable homeTeam: String, @PathVariable awayTeam: String): ResponseEntity<MatchPredictionDTO> {
-        var matchPrediction = matchService.predictMatch(homeTeam, awayTeam)
+        val matchPrediction = matchService.predictMatch(homeTeam, awayTeam)
         return ResponseEntity.ok(matchPrediction.toDTO())
     }
 

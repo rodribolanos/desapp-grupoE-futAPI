@@ -8,9 +8,12 @@ import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.Clock
 
 @Component
-class TeamFixturesExtractor {
+class TeamFixturesExtractor(
+    private val clock: Clock = Clock.systemDefaultZone()
+) {
 
     private val rowSelector = "#team-fixture-wrapper .divtable-row"
     private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yy")
@@ -30,7 +33,7 @@ class TeamFixturesExtractor {
     }
 
     private fun parseRows(rows: List<HtmlElement>): List<UpcomingMatch> {
-        val today = LocalDate.now()
+        val today = LocalDate.now(clock)
         val upcoming = mutableListOf<UpcomingMatch>()
 
         for (row in rows) {
