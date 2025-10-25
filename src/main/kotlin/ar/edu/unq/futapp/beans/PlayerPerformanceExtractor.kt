@@ -25,7 +25,9 @@ class PlayerPerformanceExtractor {
     private fun extractPlayerName(browser: WebBrowser): String {
         val nameElement = browser.queryAll("h1.header-name").firstOrNull()
             ?: throw ParsingException("Player name not found")
-        return nameElement.text().trim()
+
+        val inner = nameElement.attr("innerHTML")
+        return inner?.replace(Regex("<.*?>"), "")?.trim() ?: ""
     }
 
     private fun extractedParticipations(rows: List<HtmlElement>): List<Performance> {
@@ -77,13 +79,13 @@ class PlayerPerformanceExtractor {
             ?.trim()
             ?: extractColumnValue(columns, 1)
 
-    private fun extractCompetition(columns: List<HtmlElement>): String =
-        columns.getOrNull(4)
-            ?.queryAll("a.tournament-link")
-            ?.firstOrNull()
-            ?.text()
-            ?.trim()
-            ?: extractColumnValue(columns, 4)
+    private fun extractCompetition(columns: List<HtmlElement>): String {
+        val tournamentElement = columns.getOrNull(4)?.queryAll("a.tournament-link")?.firstOrNull()
+
+        val inner = tournamentElement?.attr("innerHTML")
+        return inner?.replace(Regex("<.*?>"), "")?.trim() ?: ""
+
+    }
 
     private fun extractAppearances(columns: List<HtmlElement>): Int {
         val text = extractColumnValue(columns, 5)
