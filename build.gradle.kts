@@ -4,6 +4,7 @@ plugins {
 	id("org.springframework.boot") version "3.2.5"
 	id("io.spring.dependency-management") version "1.1.7"
 	kotlin("plugin.jpa") version "1.9.25"
+	id("jacoco")
 }
 
 group = "ar.edu.unq"
@@ -68,7 +69,18 @@ allOpen {
     annotation("jakarta.persistence.Embeddable")
 }
 
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
     jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
+}
+
+tasks.build {
+    dependsOn(tasks.jacocoTestReport)
 }
