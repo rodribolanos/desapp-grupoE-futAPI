@@ -35,8 +35,15 @@ jobs:
 
       # Compilación + tests
       - name: Build with Gradle Wrapper
-        run: ./gradlew build
-      
+        run: ./gradlew build jacocoTestReport
+
+      - name: Validate Coverage
+        uses: madrapps/jacoco-report-action@v1.6.1
+        with:
+          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-line: 0.70
+          
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
