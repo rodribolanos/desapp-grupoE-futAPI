@@ -35,7 +35,7 @@ jobs:
 
       # Compilación + tests
       - name: Build with Gradle Wrapper
-        run: ./gradlew build jacocoTestReport
+        run: ./gradlew clean build jacocoTestReport
         
       - name: Validate Coverage Manually
         run: |
