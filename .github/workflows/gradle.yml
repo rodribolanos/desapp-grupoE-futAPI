@@ -15,15 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      checks: write
-      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
 
       # Gradlew permissions
       - name: Give gradlew permissions
-        run: chmod +x ./gradlew
+        run: chmod +x ./gradlew 
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -38,14 +36,29 @@ jobs:
       # Compilación + tests
       - name: Build with Gradle Wrapper
         run: ./gradlew build jacocoTestReport
-
-      - name: Validate Coverage
-        uses: madrapps/jacoco-report-action@v1.6.1
-        with:
-          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-line: 0.70
+        
+      - name: Validate Coverage Manually
+        run: |
+          echo "Validating JaCoCo coverage..."
+          MINIMUM_COVERAGE=70
           
+          # 2. Usar Awk para leer el reporte XML y extraer el porcentaje de LÍNEAS.
+          COVERAGE_PERCENTAGE=$(awk -F'"' '/<counter type="LINE"/{print $6 / ($4 + $6) * 100}' build/reports/jacoco/test/jacocoTestReport.xml)
+          echo "Coverage found: $COVERAGE_PERCENTAGE%"
+          echo "Minimum required: $MINIMUM_COVERAGE%"
+
+          # 3. Comparar usando 'awk'
+          IS_BELOW_THRESHOLD=$(awk -v coverage="$COVERAGE_PERCENTAGE" -v min="$MINIMUM_COVERAGE" 'BEGIN { print (coverage < min) }')
+
+          if [ "$IS_BELOW_THRESHOLD" -eq 1 ]; then
+            # Mensaje de error claro antes de salir
+            echo "Error: Code coverage is $COVERAGE_PERCENTAGE%, which is below the required $MINIMUM_COVERAGE%."
+            exit 1 # <--- ¡Esto hace que el build falle!
+          else
+            # Mensaje de éxito
+            echo "Coverage check passed."
+          fi
+        
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
