@@ -5,7 +5,6 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.7"
 	kotlin("plugin.jpa") version "1.9.25"
 	id("jacoco")
-	id("org.sonarqube") version "5.1.0.4882"
 }
 
 group = "ar.edu.unq"
@@ -71,65 +70,76 @@ allOpen {
 	annotation("jakarta.persistence.Embeddable")
 }
 
+// --- BLOQUE 1: CONFIGURACIÓN DE TESTS ---
 tasks.withType<Test> {
 	useJUnitPlatform()
 	jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
+
+	// Correcto: asegura que el reporte se genere al finalizar los tests
 	finalizedBy(tasks.named("jacocoTestReport"))
 }
 
 
+// --- BLOQUE 2: CONFIGURACIÓN DE REPORTE JACOCO ---
 tasks.named<JacocoReport>("jacocoTestReport") {
-    dependsOn(tasks.named<Test>("test"))
+	// Asegura que los tests se hayan ejecutado ANTES de generar el reporte
+	dependsOn(tasks.named<Test>("test"))
 
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-    }
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
 
-    classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main")))
-    sourceDirectories.setFrom(files("src/main/kotlin"))
-    executionData.setFrom(fileTree(layout.buildDirectory) {
-        include("**/jacoco/test.exec")
-    })
+	// Rutas correctas para Kotlin
+	classDirectories.setFrom(files("$buildDir/classes/kotlin/main"))
+	sourceDirectories.setFrom(files("src/main/kotlin"))
+	executionData.setFrom(fileTree(buildDir) {
+		include("**/jacoco/test.exec")
+	})
 }
 
+// --- BLOQUE 3: APLICAR FILTROS AL REPORTE ---
 afterEvaluate {
-    tasks.named<JacocoReport>("jacocoTestReport") {
-        classDirectories.setFrom(files(classDirectories.files.map {
-            fileTree(it) {
-                exclude(
-                    // Excluir clases que no quieren ser testeadas (DTOs, App, Config)
-                    "**/config/**",
-                    "**/dto/**",
-                    "**/ar/edu/unq/futapp/FutappApplicationKt.class",
-                    "**/*\\$*.class"
-                )
-            }
-        }))
-    }
+	tasks.named<JacocoReport>("jacocoTestReport") {
+		classDirectories.setFrom(files(classDirectories.files.map {
+			fileTree(it) {
+				exclude(
+					// Excluir clases que no quieren ser testeadas (DTOs, App, Config)
+					"**/config/**",
+					"**/dto/**",
+					"**/ar/edu/unq/futapp/FutappApplicationKt.class",
+					"**/*\$*.class"
+				)
+			}
+		}))
+	}
 }
 
+// --- BLOQUE 4: VALIDACIÓN DE COBERTURA (BASE) ---
 tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
-    dependsOn(tasks.named("jacocoTestReport"))
+	// Le decimos que se ejecute DESPUÉS del reporte
+	dependsOn(tasks.named("jacocoTestReport"))
 
-    violationRules {
-        rule {
-            element = "BUNDLE"
-            limit {
-                counter = "LINE"
-                value = "COVEREDRATIO"
-                minimum = "0.70".toBigDecimal()
-            }
-        }
-    }
+	violationRules {
+		rule {
+			element = "BUNDLE"
+			limit {
+				counter = "LINE"
+				value = "COVEREDRATIO"
+				minimum = "0.70".toBigDecimal() // ¡Tu 70%!
+			}
+		}
+	}
 
-    classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main")))
-    sourceDirectories.setFrom(files("src/main/kotlin"))
-    executionData.setFrom(fileTree(layout.buildDirectory) {
-        include("**/jacoco/test.exec")
-    })
+	// Debemos aplicar los MISMOS filtros que en jacocoTestReport
+	classDirectories.setFrom(files("$buildDir/classes/kotlin/main"))
+	sourceDirectories.setFrom(files("src/main/kotlin"))
+	executionData.setFrom(fileTree(buildDir) {
+		include("**/jacoco/test.exec")
+	})
 }
 
+// --- BLOQUE 5: APLICAR FILTROS A LA VALIDACIÓN ---
 afterEvaluate {
 	tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
 		classDirectories.setFrom(files(classDirectories.files.map {
@@ -138,27 +148,9 @@ afterEvaluate {
 					"**/config/**",
 					"**/dto/**",
 					"**/ar/edu/unq/futapp/FutappApplicationKt.class",
-					"**/*\\$*.class"
+					"**/*\$*.class"
 				)
 			}
 		}))
 	}
-}
-
-sonarqube {
-    properties {
-        property("sonar.projectKey", "ar.edu.unq:futapp")
-        property("sonar.projectName", "futapp")
-        property("sonar.projectVersion", version)
-        property("sonar.sources", "src/main/kotlin")
-        property("sonar.tests", "src/test/kotlin")
-        property(
-            "sonar.coverage.jacoco.xmlReportPaths",
-            layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath
-        )
-    }
-}
-
-tasks.named("sonarqube") {
-	dependsOn(tasks.named("jacocoTestReport"))
 }
