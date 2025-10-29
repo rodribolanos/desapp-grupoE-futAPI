@@ -37,7 +37,7 @@ jobs:
       - name: Build with Gradle Wrapper
         run: ./gradlew clean build jacocoTestReport
         
-      # Sube el reporte HTML (sigue siendo útil)
+      # Sube el reporte HTML
       - name: Upload JaCoCo HTML Report for Debugging
         uses: actions/upload-artifact@v4
         if: always() 
@@ -45,17 +45,6 @@ jobs:
           name: jacoco-html-report
           path: build/reports/jacoco/test/html/
       
-      # --- ¡NUEVO STEP DE DEBUG! ---
-      # Imprime el contenido del reporte XML antes de validarlo.
-      # Esto nos mostrará por qué awk está fallando.
-      - name: Dump JaCoCo XML Report to Log
-        if: always() # Corre incluso si el build falla
-        run: |
-          echo "--- START: build/reports/jacoco/test/jacocoTestReport.xml ---"
-          cat build/reports/jacoco/test/jacocoTestReport.xml
-          echo "--- END: build/reports/jacoco/test/jacocoTestReport.xml ---"
-      
-      # El script de validación ROBUSTO
       - name: Validate Coverage Manually
         run: |
           echo "Validating JaCoCo coverage..."
@@ -68,14 +57,19 @@ jobs:
           fi
 
           # 2. Extraer el porcentaje (manejando el caso 0/0)
-          RAW_COVERAGE=$(awk -F'"' '/<counter type="LINE"/{ 
+          # --- ¡LÓGICA CORREGIDA! ---
+          # Primero, aislamos la *última* línea <counter type="LINE">, que es el resumen total.
+          RAW_LINE=$(grep '<counter type="LINE"' "$REPORT_FILE" | tail -1)
+
+          # Ahora, aplicamos awk a esa única línea
+          RAW_COVERAGE=$(echo "$RAW_LINE" | awk -F'"' '/<counter type="LINE"/{ 
             total = $4 + $6; 
             if (total == 0) { 
               print 0 
             } else { 
               print $6 / total * 100 
             } 
-          }' "$REPORT_FILE")
+          }')
 
           COVERAGE_PERCENTAGE=${RAW_COVERAGE:-0}
 
@@ -112,4 +106,3 @@ jobs:
 
       - name: Generate and submit dependency graph
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-
