@@ -19,7 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Gradlew permissions
       - name: Give gradlew permissions
         run: chmod +x ./gradlew
 
@@ -29,28 +28,40 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # Configuración de Gradle con cache
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
-      # Compilación + tests + REPORTE + VALIDACIÓN
+      # Ejecuta el build Y la validación de cobertura
       - name: Build and Verify Coverage
         run: ./gradlew clean build jacocoTestCoverageVerification
         
-      # Sube el reporte HTML (sigue siendo útil)
-      - name: Upload JaCoCo HTML Report for Debugging
+      # Sube el reporte HTML (útil para depurar si falla)
+      - name: Upload JaCoCo HTML Report
         uses: actions/upload-artifact@v4
         if: always() 
         with:
           name: jacoco-html-report
           path: build/reports/jacoco/test/html/
           
+      # Sube el reporte XML a Codecov
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           files: ./build/reports/jacoco/test/jacocoTestReport.xml
           
+  # --- ESTE ES EL JOB QUE DA EL ERROR ---
   dependency-submission:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Generate and submit dependency graph
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
