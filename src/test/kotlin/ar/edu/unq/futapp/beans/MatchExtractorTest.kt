@@ -8,10 +8,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import ar.edu.unq.futapp.model.Match
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ActiveProfiles("test")
 class MatchExtractorTest {
 
     private lateinit var browser: JsoupWebBrowser

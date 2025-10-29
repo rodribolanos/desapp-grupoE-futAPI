@@ -4,11 +4,14 @@ import ar.edu.unq.futapp.exception.OverloadBrowserException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withTimeout
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
+import org.springframework.context.annotation.Profile
 import java.util.concurrent.TimeUnit
 
 @Component
-class SynchronizedSeleniumWrapper(val seleniumWebBrowser: SeleniumWebBrowser) {
+@Profile("default")
+class SynchronizedSeleniumWrapper(@param:Lazy val seleniumWebBrowser: SeleniumWebBrowser) {
     private val timeoutInMillis: Long = TimeUnit.SECONDS.toMillis(10)
     private val mutex = Mutex()
 

@@ -3,10 +3,12 @@ package ar.edu.unq.futapp.beans
 import ar.edu.unq.futapp.utils.PlayerApiUtils
 import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import kotlin.test.assertEquals
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ActiveProfiles("test")
 class PlayerPerformanceExtractorTest {
     lateinit var browser : JsoupWebBrowser
     private val extractor = PlayerPerformanceExtractor()
