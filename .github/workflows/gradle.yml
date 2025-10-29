@@ -33,9 +33,19 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
+      # Compilación + tests + reporte de coverage
+      # Usamos 'clean' para asegurar que los tests se corran de cero
       - name: Build with Gradle Wrapper
         run: ./gradlew clean build jacocoTestReport
         
+      - name: Upload JaCoCo HTML Report for Debugging
+        uses: actions/upload-artifact@v4
+        if: always() # Sube el reporte incluso si los pasos siguientes fallan
+        with:
+          name: jacoco-html-report
+          path: build/reports/jacoco/test/html/
+      
+      # El script de validación ROBUSTO (maneja división por cero)
       - name: Validate Coverage Manually
         run: |
           echo "Validating JaCoCo coverage..."
@@ -91,4 +101,5 @@ jobs:
           distribution: 'temurin'
 
       - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+
