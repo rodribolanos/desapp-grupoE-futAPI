@@ -79,13 +79,13 @@ tasks.withType<Test> {
 }
 
 
-// --- BLOQUE 2: CONFIGURACIÓN DE JACOCO ---
+// --- BLOQUE 2: CONFIGURACIÓN DE JACOCO (Corregido) ---
 tasks.named<JacocoReport>("jacocoTestReport") {
 	// Asegura que los tests se hayan ejecutado ANTES de generar el reporte
 	dependsOn(tasks.named<Test>("test"))
 
 	reports {
-		xml.required.set(true) 
+		xml.required.set(true)
 		html.required.set(true)
 	}
 
@@ -95,9 +95,11 @@ tasks.named<JacocoReport>("jacocoTestReport") {
 	executionData.setFrom(fileTree(buildDir) {
 		include("**/jacoco/test.exec")
 	})
+}
 
-    // Filtros correctos para Kotlin
-	afterEvaluate {
+// --- BLOQUE 3: APLICAR FILTROS (Movido) ---
+afterEvaluate {
+	tasks.named<JacocoReport>("jacocoTestReport") {
 		classDirectories.setFrom(files(classDirectories.files.map {
 			fileTree(it) {
 				exclude(
