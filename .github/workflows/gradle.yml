@@ -21,7 +21,7 @@ jobs:
 
       # Gradlew permissions
       - name: Give gradlew permissions
-        run: chmod +x ./gradlew 
+        run: chmod +x ./gradlew
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -33,7 +33,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
-      # Compilación + tests
       - name: Build with Gradle Wrapper
         run: ./gradlew clean build jacocoTestReport
         
@@ -41,24 +40,38 @@ jobs:
         run: |
           echo "Validating JaCoCo coverage..."
           MINIMUM_COVERAGE=70
-          
-          # 2. Usar Awk para leer el reporte XML y extraer el porcentaje de LÍNEAS.
-          COVERAGE_PERCENTAGE=$(awk -F'"' '/<counter type="LINE"/{print $6 / ($4 + $6) * 100}' build/reports/jacoco/test/jacocoTestReport.xml)
+          REPORT_FILE="build/reports/jacoco/test/jacocoTestReport.xml"
+
+          if [ ! -f "$REPORT_FILE" ]; then
+            echo "Error: JaCoCo report file not found at $REPORT_FILE"
+            exit 1
+          fi
+
+          # 2. Extraer el porcentaje (manejando el caso 0/0)
+          RAW_COVERAGE=$(awk -F'"' '/<counter type="LINE"/{ 
+            total = $4 + $6; 
+            if (total == 0) { 
+              print 0 
+            } else { 
+              print $6 / total * 100 
+            } 
+          }' "$REPORT_FILE")
+
+          COVERAGE_PERCENTAGE=${RAW_COVERAGE:-0}
+
           echo "Coverage found: $COVERAGE_PERCENTAGE%"
           echo "Minimum required: $MINIMUM_COVERAGE%"
 
-          # 3. Comparar usando 'awk'
+          # 3. Comparar
           IS_BELOW_THRESHOLD=$(awk -v coverage="$COVERAGE_PERCENTAGE" -v min="$MINIMUM_COVERAGE" 'BEGIN { print (coverage < min) }')
 
           if [ "$IS_BELOW_THRESHOLD" -eq 1 ]; then
-            # Mensaje de error claro antes de salir
             echo "Error: Code coverage is $COVERAGE_PERCENTAGE%, which is below the required $MINIMUM_COVERAGE%."
             exit 1 # <--- ¡Esto hace que el build falle!
           else
-            # Mensaje de éxito
             echo "Coverage check passed."
           fi
-        
+          
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
