@@ -69,18 +69,45 @@ allOpen {
     annotation("jakarta.persistence.Embeddable")
 }
 
-tasks.jacocoTestReport {
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-    }
-}
-
+// --- BLOQUE 1: CONFIGURACIÓN DE TESTS ---
 tasks.withType<Test> {
-    useJUnitPlatform()
-    jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
+	useJUnitPlatform()
+	jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
+
+    // Correcto: asegura que el reporte se genere al finalizar los tests
+	finalizedBy(tasks.named("jacocoTestReport"))
 }
 
-tasks.build {
-    dependsOn(tasks.jacocoTestReport)
+
+// --- BLOQUE 2: CONFIGURACIÓN DE JACOCO ---
+tasks.named<JacocoReport>("jacocoTestReport") {
+	// Asegura que los tests se hayan ejecutado ANTES de generar el reporte
+	dependsOn(tasks.named<Test>("test"))
+
+	reports {
+		xml.required.set(true) 
+		html.required.set(true)
+	}
+
+    // Rutas correctas para Kotlin
+	classDirectories.setFrom(files("$buildDir/classes/kotlin/main"))
+	sourceDirectories.setFrom(files("src/main/kotlin"))
+	executionData.setFrom(fileTree(buildDir) {
+		include("**/jacoco/test.exec")
+	})
+
+    // Filtros correctos para Kotlin
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.map {
+			fileTree(it) {
+				exclude(
+					// Excluir clases que no quieren ser testeadas (DTOs, App, Config)
+					"**/config/**",
+					"**/dto/**",
+					"**/ar/edu/unq/futapp/FutappApplicationKt.class",
+					"**/*\$*.class"
+				)
+			}
+		}))
+	}
 }
