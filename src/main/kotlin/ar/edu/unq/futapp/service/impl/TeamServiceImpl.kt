@@ -24,8 +24,6 @@ class TeamServiceImpl @Autowired constructor(
     val teamRepository: TeamRepository,
     val eventPublisher: ApplicationEventPublisher
 ) : TeamService {
-    private val logger = LoggerFactory.getLogger(TeamServiceImpl::class.java)
-
     @Transactional
     override fun findPlayersByTeam(teamName: String): List<Player> {
         var team: Optional<Team> = teamRepository.findById(teamName)
