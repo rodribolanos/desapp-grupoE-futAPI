@@ -16,10 +16,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @SpringBootTest
+@ActiveProfiles("test")
 class WhoScoredTeamProxyServiceTest() {
     private lateinit var playerPerformanceExtractor: PlayerPerformanceExtractor
     private lateinit var initialSearchExtractor: InitialSearchExtractor
@@ -56,7 +58,7 @@ class WhoScoredTeamProxyServiceTest() {
         // Arrange
         val teamName = "Boca Juniors"
         val url = "http://test/url"
-        val expected = Team(teamName, listOf(
+        val expected = Team(teamName, mutableListOf(
             Player("Rodrigo Battaglia", 3, 1, 0, 7.21)
         ))
         every { webBrowserFactory.create(true) } returns browser

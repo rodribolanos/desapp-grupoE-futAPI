@@ -1,21 +1,28 @@
 package ar.edu.unq.futapp.model
 
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.Id
-import jakarta.persistence.OneToMany
+import jakarta.persistence.*
 
 @Entity
 class Team() {
     @Id
-    lateinit var name: String
+    var name: String = ""
+
     @OneToMany(mappedBy = "team", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    lateinit var players: MutableList<Player>
+    var players: MutableList<Player> = mutableListOf()
 
     constructor(name: String, players: MutableList<Player>) : this() {
         this.name = name
         this.players = players
         players.forEach { it.team = this }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as Team
+        if (name.isBlank() || other.name.isBlank()) return false
+        return name == other.name && players == other.players
+    }
+
+    override fun hashCode(): Int = if (name.isBlank()) javaClass.hashCode() else name.hashCode()
 }

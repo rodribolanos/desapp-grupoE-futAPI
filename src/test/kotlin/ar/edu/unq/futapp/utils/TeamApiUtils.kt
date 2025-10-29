@@ -47,6 +47,6 @@ object TeamApiUtils {
 
     fun expectedTeamForPlayerListPage(): Team = Team(
         name = "Boca Juniors",
-        players = expectedPlayersForPlayerListPage()
+        players = expectedPlayersForPlayerListPage().toMutableList()
     )
 }

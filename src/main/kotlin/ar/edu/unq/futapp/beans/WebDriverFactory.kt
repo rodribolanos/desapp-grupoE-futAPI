@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.Profile
 import java.net.MalformedURLException
 import java.net.URI
 import java.time.Duration
 
 @Configuration
+@Profile("default")
 class WebDriverFactory {
     @Value("\${webdriver.url:http://selenium:4444/wd/hub}")
     private lateinit var REMOTE_URL_ENV: String
@@ -33,6 +35,7 @@ class WebDriverFactory {
     }
 
     @Bean
+    @Lazy
     fun webBrowserFactory(@Lazy synchronizedSeleniumWrapper: SynchronizedSeleniumWrapper): WebBrowserFactory =
         object : WebBrowserFactory {
             override fun create(headless: Boolean): WebBrowser = synchronizedSeleniumWrapper.seleniumWebBrowser()
