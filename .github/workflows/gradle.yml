@@ -34,18 +34,28 @@ jobs:
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
       # Compilación + tests + reporte de coverage
-      # Usamos 'clean' para asegurar que los tests se corran de cero
       - name: Build with Gradle Wrapper
         run: ./gradlew clean build jacocoTestReport
         
+      # Sube el reporte HTML (sigue siendo útil)
       - name: Upload JaCoCo HTML Report for Debugging
         uses: actions/upload-artifact@v4
-        if: always() # Sube el reporte incluso si los pasos siguientes fallan
+        if: always() 
         with:
           name: jacoco-html-report
           path: build/reports/jacoco/test/html/
       
-      # El script de validación ROBUSTO (maneja división por cero)
+      # --- ¡NUEVO STEP DE DEBUG! ---
+      # Imprime el contenido del reporte XML antes de validarlo.
+      # Esto nos mostrará por qué awk está fallando.
+      - name: Dump JaCoCo XML Report to Log
+        if: always() # Corre incluso si el build falla
+        run: |
+          echo "--- START: build/reports/jacoco/test/jacocoTestReport.xml ---"
+          cat build/reports/jacoco/test/jacocoTestReport.xml
+          echo "--- END: build/reports/jacoco/test/jacocoTestReport.xml ---"
+      
+      # El script de validación ROBUSTO
       - name: Validate Coverage Manually
         run: |
           echo "Validating JaCoCo coverage..."
