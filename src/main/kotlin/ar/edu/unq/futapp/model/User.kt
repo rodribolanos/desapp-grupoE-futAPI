@@ -1,6 +1,5 @@
 package ar.edu.unq.futapp.model
 
-import ar.edu.unq.futapp.exception.InvalidPasswordException
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id

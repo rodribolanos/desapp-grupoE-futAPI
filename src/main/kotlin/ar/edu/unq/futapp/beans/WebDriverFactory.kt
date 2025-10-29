@@ -33,8 +33,8 @@ class WebDriverFactory {
     }
 
     @Bean
-    fun webBrowserFactory(@Lazy webDriver: WebDriver): WebBrowserFactory =
+    fun webBrowserFactory(@Lazy synchronizedSeleniumWrapper: SynchronizedSeleniumWrapper): WebBrowserFactory =
         object : WebBrowserFactory {
-            override fun create(headless: Boolean): WebBrowser = SeleniumWebBrowser(webDriver)
+            override fun create(headless: Boolean): WebBrowser = synchronizedSeleniumWrapper.seleniumWebBrowser()
         }
 }
