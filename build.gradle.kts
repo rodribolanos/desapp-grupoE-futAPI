@@ -53,6 +53,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
     implementation("org.seleniumhq.selenium:selenium-java:4.35.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     testImplementation("org.jsoup:jsoup:1.21.2")
     testImplementation("io.mockk:mockk:1.14.5")
 }
