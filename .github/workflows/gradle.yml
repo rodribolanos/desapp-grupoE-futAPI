@@ -37,7 +37,7 @@ jobs:
       - name: Build with Gradle Wrapper
         run: ./gradlew clean build jacocoTestReport
         
-      # Sube el reporte HTML
+      # Sube el reporte HTML (sigue siendo útil)
       - name: Upload JaCoCo HTML Report for Debugging
         uses: actions/upload-artifact@v4
         if: always() 
@@ -45,6 +45,7 @@ jobs:
           name: jacoco-html-report
           path: build/reports/jacoco/test/html/
       
+      # El script de validación ROBUSTO (Corregido)
       - name: Validate Coverage Manually
         run: |
           echo "Validating JaCoCo coverage..."
@@ -57,19 +58,22 @@ jobs:
           fi
 
           # 2. Extraer el porcentaje (manejando el caso 0/0)
-          # --- ¡LÓGICA CORREGIDA! ---
-          # Primero, aislamos la *última* línea <counter type="LINE">, que es el resumen total.
-          RAW_LINE=$(grep '<counter type="LINE"' "$REPORT_FILE" | tail -1)
-
-          # Ahora, aplicamos awk a esa única línea
-          RAW_COVERAGE=$(echo "$RAW_LINE" | awk -F'"' '/<counter type="LINE"/{ 
-            total = $4 + $6; 
-            if (total == 0) { 
-              print 0 
-            } else { 
-              print $6 / total * 100 
+          # --- ¡LÓGICA CORREGIDA v2! ---
+          # Usamos un script de awk único y más robusto.
+          # 1. Lee todas las líneas <counter type="LINE">
+          # 2. Guarda el porcentaje de cada una en la variable 'p'.
+          # 3. Al final (END), imprime el *último* valor de 'p' (que es el resumen total).
+          RAW_COVERAGE=$(awk -F'"' '
+            /<counter type="LINE"/ { 
+              total = $4 + $6; 
+              if (total == 0) { 
+                p = 0 
+              } else { 
+                p = $6 / total * 100 
+              } 
             } 
-          }')
+            END { print p }
+          ' "$REPORT_FILE")
 
           COVERAGE_PERCENTAGE=${RAW_COVERAGE:-0}
 
@@ -106,3 +110,4 @@ jobs:
 
       - name: Generate and submit dependency graph
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+
