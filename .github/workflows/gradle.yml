@@ -33,9 +33,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
-      # Compilación + tests + reporte de coverage
-      - name: Build with Gradle Wrapper
-        run: ./gradlew clean build jacocoTestReport
+      # Compilación + tests + REPORTE + VALIDACIÓN
+      - name: Build and Verify Coverage
+        run: ./gradlew clean build jacocoTestCoverageVerification
         
       # Sube el reporte HTML (sigue siendo útil)
       - name: Upload JaCoCo HTML Report for Debugging
@@ -44,51 +44,6 @@ jobs:
         with:
           name: jacoco-html-report
           path: build/reports/jacoco/test/html/
-      
-      # El script de validación ROBUSTO (Corregido)
-      - name: Validate Coverage Manually
-        run: |
-          echo "Validating JaCoCo coverage..."
-          MINIMUM_COVERAGE=70
-          REPORT_FILE="build/reports/jacoco/test/jacocoTestReport.xml"
-
-          if [ ! -f "$REPORT_FILE" ]; then
-            echo "Error: JaCoCo report file not found at $REPORT_FILE"
-            exit 1
-          fi
-
-          # 2. Extraer el porcentaje (manejando el caso 0/0)
-          # --- ¡LÓGICA CORREGIDA v2! ---
-          # Usamos un script de awk único y más robusto.
-          # 1. Lee todas las líneas <counter type="LINE">
-          # 2. Guarda el porcentaje de cada una en la variable 'p'.
-          # 3. Al final (END), imprime el *último* valor de 'p' (que es el resumen total).
-          RAW_COVERAGE=$(awk -F'"' '
-            /<counter type="LINE"/ { 
-              total = $4 + $6; 
-              if (total == 0) { 
-                p = 0 
-              } else { 
-                p = $6 / total * 100 
-              } 
-            } 
-            END { print p }
-          ' "$REPORT_FILE")
-
-          COVERAGE_PERCENTAGE=${RAW_COVERAGE:-0}
-
-          echo "Coverage found: $COVERAGE_PERCENTAGE%"
-          echo "Minimum required: $MINIMUM_COVERAGE%"
-
-          # 3. Comparar
-          IS_BELOW_THRESHOLD=$(awk -v coverage="$COVERAGE_PERCENTAGE" -v min="$MINIMUM_COVERAGE" 'BEGIN { print (coverage < min) }')
-
-          if [ "$IS_BELOW_THRESHOLD" -eq 1 ]; then
-            echo "Error: Code coverage is $COVERAGE_PERCENTAGE%, which is below the required $MINIMUM_COVERAGE%."
-            exit 1 # <--- ¡Esto hace que el build falle!
-          else
-            echo "Coverage check passed."
-          fi
           
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -99,15 +54,3 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Generate and submit dependency graph
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-
