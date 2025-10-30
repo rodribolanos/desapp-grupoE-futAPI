@@ -1,6 +1,7 @@
 package ar.edu.unq.futapp.beans
 
 import ar.edu.unq.futapp.exception.EntityNotFound
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
@@ -18,6 +19,7 @@ class InitialSearchExtractor {
             .toUri()
     }
 
+    @Cacheable("teamUrls", key = "#teamName")
     fun getFirstTeamUrl(browser: WebBrowser, teamName: String): String {
         val uri = buildSearchUri(teamName)
         browser.goTo(uri.toString())
