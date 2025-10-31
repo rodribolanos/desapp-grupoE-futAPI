@@ -6,9 +6,15 @@ import org.openqa.selenium.TimeoutException
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.ui.WebDriverWait
+import org.springframework.stereotype.Component
+import org.springframework.context.annotation.Profile
 import java.time.Duration
 
+@Component
+@Profile("default")
 class SeleniumWebBrowser(private val driver: WebDriver) : WebBrowser {
+    private lateinit var onCloseListener: () -> Unit
+
     override fun goTo(url: String) {
         driver.get(url)
     }
@@ -27,7 +33,11 @@ class SeleniumWebBrowser(private val driver: WebDriver) : WebBrowser {
     }
 
     override fun close() {
-        // No hacemos nada: la sesión se preserva y el cierre lo gestiona Spring (destroyMethod="quit").
+        onCloseListener.invoke()
+    }
+
+    fun setOnCloseListener(onClose: () -> Unit) {
+       onCloseListener = onClose
     }
 }
 

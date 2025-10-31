@@ -5,12 +5,14 @@ import ar.edu.unq.futapp.model.UpcomingMatch
 import ar.edu.unq.futapp.utils.TeamApiUtils
 import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.Clock
 import java.time.ZoneId
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ActiveProfiles("test")
 class TeamFixturesExtractorTest {
     lateinit var browser : JsoupWebBrowser
     private val extractor = TeamFixturesExtractor(

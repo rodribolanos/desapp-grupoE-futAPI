@@ -64,6 +64,17 @@ class GlobalExceptionHandler {
             HttpStatus.CONFLICT
         )
 
+    @ExceptionHandler(OverloadBrowserException::class)
+    fun handleOverloadBrowser(ex: OverloadBrowserException): ResponseEntity<ExceptionDTO> =
+        ResponseEntity(
+            ExceptionDTO(
+                "SERVICE_UNAVAILABLE",
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                ex.message
+            ),
+            HttpStatus.SERVICE_UNAVAILABLE
+        )
+
     @ExceptionHandler(EntityNotFound::class)
     fun handleEntityNotFound(ex: EntityNotFound): ResponseEntity<ExceptionDTO> =
         ResponseEntity(
