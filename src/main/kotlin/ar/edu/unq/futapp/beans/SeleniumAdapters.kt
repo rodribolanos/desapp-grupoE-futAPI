@@ -16,7 +16,7 @@ class SeleniumWebBrowser(private val driver: WebDriver) : WebBrowser {
     private lateinit var onCloseListener: () -> Unit
 
     override fun goTo(url: String) {
-        driver.get(url)
+        driver[url]
     }
 
     override fun waitFor(selector: String, timeout: Duration): Boolean {

@@ -3,7 +3,6 @@ package ar.edu.unq.futapp.events
 import ar.edu.unq.futapp.repository.TeamRepository
 import ar.edu.unq.futapp.service.WhoScoredApiClient
 import ar.edu.unq.futapp.service.impl.TeamServiceImpl
-import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Async
