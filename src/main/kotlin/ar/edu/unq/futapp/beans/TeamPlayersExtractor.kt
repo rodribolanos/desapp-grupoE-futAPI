@@ -24,11 +24,12 @@ class TeamPlayersExtractor {
             ?: throw ParsingException("Team name not found")
         val playerRows = browser.queryAll("#top-player-stats-summary-grid tbody tr")
         val players = extractedPlayers(playerRows)
-        return Team(name = teamName, players = players)
+        val team = Team(name = teamName, players = players)
+        return team
     }
 
-    private fun extractedPlayers(playerRows: List<HtmlElement>): List<Player> =
-        playerRows.map { row -> extractedPlayer(row) }
+    private fun extractedPlayers(playerRows: List<HtmlElement>): MutableList<Player> =
+        playerRows.map { row -> extractedPlayer(row) }.toMutableList()
 
     private fun extractedPlayer(row: HtmlElement): Player {
         val columns = row.queryAll("td")
@@ -43,7 +44,7 @@ class TeamPlayersExtractor {
             playedGames = playedGames,
             goals = goals,
             assists = assists,
-            rating = rating
+            rating = rating,
         )
     }
 

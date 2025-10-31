@@ -38,13 +38,8 @@ Desapp-grupoE-futAPI es una API desarrollada para la gestión y extracción de i
 ### Ejecución con Docker
 1. Construir la imagen:
    ```bash
-   docker build -t futapp .
-   ```
-2. Ejecutar el contenedor:
-   ```bash
-   docker run -p 8080:8080 futapp
-   ```
-
+    docker compose up -d --build --force-recreate futapp        
+    ```
 ### Ejecución de pruebas
 - Ejecutar pruebas unitarias y de integración:
   ```bash
@@ -53,7 +48,6 @@ Desapp-grupoE-futAPI es una API desarrollada para la gestión y extracción de i
 
 ## Variables de entorno
 - `WEBDRIVER_URL`: Ruta hacia el Standalone Server de Selenium (por ejemplo, `http://localhost:4444/wd/hub`).
-- `SPRING_PROFILES_ACTIVE`: Perfil de Spring Boot (`dev`, `test`, `prod`).
 
 ## Notas
 - Para ejecutar scraping con Selenium en Docker, se recomienda usar imágenes como `selenium/standalone-chrome` y conectar la API vía WebDriver remoto.

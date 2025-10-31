@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.resource.NoResourceFoundException
+import jakarta.validation.ConstraintViolationException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -18,6 +19,19 @@ class GlobalExceptionHandler {
     fun handleValidationException(ex: MethodArgumentNotValidException): ResponseEntity<ExceptionDTO> {
         val errors = ex.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "Error de validación") }
         val description = errors.toString()
+        val exceptionDTO = ExceptionDTO(
+            "BAD_REQUEST",
+            HttpStatus.BAD_REQUEST.value(),
+            description
+        )
+        return ResponseEntity(exceptionDTO, HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(ConstraintViolationException::class)
+    fun handleConstraintViolation(ex: ConstraintViolationException): ResponseEntity<ExceptionDTO> {
+        val description = ex.constraintViolations
+            .joinToString("; ") { v -> "${v.propertyPath}: ${v.message}" }
+            .ifBlank { ex.message ?: "Validation failed" }
         val exceptionDTO = ExceptionDTO(
             "BAD_REQUEST",
             HttpStatus.BAD_REQUEST.value(),
@@ -48,6 +62,17 @@ class GlobalExceptionHandler {
         ResponseEntity(
             ExceptionDTO("CONFLICT", HttpStatus.CONFLICT.value(), ex.message ?: "El usuario ya existe"),
             HttpStatus.CONFLICT
+        )
+
+    @ExceptionHandler(OverloadBrowserException::class)
+    fun handleOverloadBrowser(ex: OverloadBrowserException): ResponseEntity<ExceptionDTO> =
+        ResponseEntity(
+            ExceptionDTO(
+                "SERVICE_UNAVAILABLE",
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                ex.message
+            ),
+            HttpStatus.SERVICE_UNAVAILABLE
         )
 
     @ExceptionHandler(EntityNotFound::class)
