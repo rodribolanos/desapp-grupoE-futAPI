@@ -5,10 +5,11 @@ import ar.edu.unq.futapp.utils.TeamApiUtils
 import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Profile
+import org.springframework.test.context.ActiveProfiles
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
-@Profile(value = ["test"])
+@ActiveProfiles("test")
 class InitialSearchExtractorTest {
     lateinit var browser : JsoupWebBrowser
     private val extractor = InitialSearchExtractor()
