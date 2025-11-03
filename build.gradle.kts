@@ -75,7 +75,12 @@ tasks.withType<Test> {
 	useJUnitPlatform()
 	jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
 
-	// Correcto: asegura que el reporte se genere al finalizar los tests
+	testLogging {
+		events("started", "passed", "skipped", "failed")
+		exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+		showStandardStreams = true
+	}
+
 	finalizedBy(tasks.named("jacocoTestReport"))
 }
 
