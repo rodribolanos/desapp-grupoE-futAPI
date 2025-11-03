@@ -154,3 +154,53 @@ afterEvaluate {
 		}))
 	}
 }
+
+tasks.register<Test>("unitTest") {
+	group = "verification"
+	description = "Ejecuta los tests unitarios (excluye Integration/E2E)."
+	useJUnitPlatform()
+	jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
+
+	include("**/unit/**", "**/*Test.class", "**/*Tests.class", "**/*Spec.class")
+	exclude("**/*IntegrationTest.class", "**/*E2ETest.class", "**/integration/**")
+
+	finalizedBy("jacocoUnitTestReport")
+}
+
+tasks.register<JacocoReport>("jacocoUnitTestReport") {
+	group = "verification"
+	description = "Genera reporte JaCoCo para unitTest"
+	dependsOn(tasks.named<Test>("unitTest"))
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+	classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main").get().asFile))
+	sourceDirectories.setFrom(files("src/main/kotlin"))
+	executionData.setFrom(fileTree(buildDir) { include("**/jacoco/test.exec") })
+}
+
+tasks.register<Test>("e2eTest") {
+	group = "verification"
+	description = "Ejecuta los tests de integración / e2e (IntegrationTest/E2ETest)."
+	useJUnitPlatform()
+	jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
+
+	include("**/integration/**", "**/*IntegrationTest.class", "**/*E2ETest.class")
+	exclude("**/unit/**")
+
+	finalizedBy("jacocoE2eTestReport")
+}
+
+tasks.register<JacocoReport>("jacocoE2eTestReport") {
+	group = "verification"
+	description = "Genera reporte JaCoCo para e2eTest"
+	dependsOn(tasks.named<Test>("e2eTest"))
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+	classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main").get().asFile))
+	sourceDirectories.setFrom(files("src/main/kotlin"))
+	executionData.setFrom(fileTree(buildDir) { include("**/jacoco/test.exec") })
+}
