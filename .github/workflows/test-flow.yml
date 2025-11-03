@@ -33,13 +33,13 @@ jobs:
           SPRING_PROFILES_ACTIVE: test
         run: |
           echo "Running unit tests in package 'unit' with profile 'test'"
-          ./gradlew --no-daemon test --tests "**.unit.*" jacocoTestReport -Dorg.gradle.jvmargs='-Xmx1024m'
+          ./gradlew --no-daemon unitTest jacocoUnitTestReport -Dorg.gradle.jvmargs='-Xmx1024m'
 
       - name: Upload unit test report
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-unit-report
-          path: build/reports/jacoco/jacocoTestReport
+          path: build/reports/jacoco/jacocoUnitTestReport
 
   integration-tests:
     name: Integration / E2E tests
@@ -70,10 +70,10 @@ jobs:
           SPRING_PROFILES_ACTIVE: integration-test
         run: |
           echo "Running integration tests in package 'integration' with profile 'integration-test'"
-          ./gradlew --no-daemon test --tests "**.integration.*" jacocoTestReport -Dorg.gradle.jvmargs='-Xmx2048m'
+          ./gradlew --no-daemon e2eTest jacocoE2eTestReport -Dorg.gradle.jvmargs='-Xmx2048m'
 
       - name: Upload integration test report
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-integration-report
-          path: build/reports/jacoco/jacocoTestReport
+          path: build/reports/jacoco/jacocoE2eTestReport
