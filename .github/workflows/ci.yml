@@ -28,6 +28,9 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
 
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
       - name: Run unit tests (package 'unit') and report
         env:
           SPRING_PROFILES_ACTIVE: test
@@ -61,6 +64,9 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}-e2e
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
       - name: Run integration tests (package 'integration') and report
         env:
