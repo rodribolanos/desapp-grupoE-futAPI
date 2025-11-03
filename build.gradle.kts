@@ -171,6 +171,8 @@ tasks.register<JacocoReport>("jacocoUnitTestReport") {
 	group = "verification"
 	description = "Genera reporte JaCoCo para unitTest"
 	dependsOn(tasks.named<Test>("unitTest"))
+	dependsOn(tasks.named<Test>("test"))
+	dependsOn(tasks.named("jacocoTestReport"))
 	reports {
 		xml.required.set(true)
 		html.required.set(true)
@@ -196,6 +198,8 @@ tasks.register<JacocoReport>("jacocoE2eTestReport") {
 	group = "verification"
 	description = "Genera reporte JaCoCo para e2eTest"
 	dependsOn(tasks.named<Test>("e2eTest"))
+	dependsOn(tasks.named<Test>("test"))
+	dependsOn(tasks.named("jacocoTestReport"))
 	reports {
 		xml.required.set(true)
 		html.required.set(true)
