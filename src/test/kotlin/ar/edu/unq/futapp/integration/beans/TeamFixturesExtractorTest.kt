@@ -1,18 +1,24 @@
-package ar.edu.unq.futapp.beans
+package ar.edu.unq.futapp.integration.beans
 
+import ar.edu.unq.futapp.beans.TeamFixturesExtractor
 import ar.edu.unq.futapp.exception.ParsingException
 import ar.edu.unq.futapp.model.UpcomingMatch
+import ar.edu.unq.futapp.utils.JsoupWebBrowser
 import ar.edu.unq.futapp.utils.TeamApiUtils
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import java.time.LocalDate
 import java.time.Clock
+import java.time.LocalDate
 import java.time.ZoneId
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ActiveProfiles("test")
+@ActiveProfiles("integration-test")
 class TeamFixturesExtractorTest {
     lateinit var browser : JsoupWebBrowser
     private val extractor = TeamFixturesExtractor(

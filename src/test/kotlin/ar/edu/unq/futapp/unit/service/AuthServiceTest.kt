@@ -1,4 +1,4 @@
-package ar.edu.unq.futapp.service
+package ar.edu.unq.futapp.unit.service
 
 import ar.edu.unq.futapp.beans.JwtUtil
 import ar.edu.unq.futapp.exception.InvalidCredentialsException
@@ -7,6 +7,8 @@ import ar.edu.unq.futapp.exception.UserAlreadyExistsException
 import ar.edu.unq.futapp.model.AuthRequest
 import ar.edu.unq.futapp.model.AuthResponse
 import ar.edu.unq.futapp.model.RefreshRequest
+import ar.edu.unq.futapp.service.AuthService
+import ar.edu.unq.futapp.service.UserService
 import ar.edu.unq.futapp.service.impl.AuthServiceImpl
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -14,10 +16,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.*
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.test.context.ActiveProfiles
 import java.util.*
 import kotlin.test.assertEquals
 
+@ActiveProfiles("test")
 class AuthServiceTest {
     private lateinit var userService: UserService
     private lateinit var jwtUtil: JwtUtil
@@ -58,7 +63,7 @@ class AuthServiceTest {
     fun whenLoginWithInvalidCredentials_thenThrowInvalidCredentialsException() {
         // Arrange
         `when`(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken::class.java)))
-            .thenThrow(org.springframework.security.authentication.BadCredentialsException("bad"))
+            .thenThrow(BadCredentialsException("bad"))
         val request = AuthRequest(username, password)
         // Act & Assert
         assertThrows<InvalidCredentialsException> { authService.login(request) }
