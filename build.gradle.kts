@@ -85,6 +85,14 @@ tasks.withType<Test> {
 	}
 }
 
+// Configurar JaCoCo para que cada task Test escriba su propio .exec
+tasks.withType<Test>().configureEach {
+    val testTaskName = name
+    extensions.configure(org.gradle.testing.jacoco.plugins.JacocoTaskExtension::class.java) {
+        destinationFile = layout.buildDirectory.file("jacoco/$testTaskName.exec").get().asFile
+    }
+}
+
 
 // --- BLOQUE 2: CONFIGURACIÓN DE REPORTE JACOCO ---
 tasks.named<JacocoReport>("jacocoTestReport") {
@@ -100,7 +108,7 @@ tasks.named<JacocoReport>("jacocoTestReport") {
 	classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main").get().asFile))
 	sourceDirectories.setFrom(files("src/main/kotlin"))
 	executionData.setFrom(fileTree(buildDirFile) {
-		include("**/jacoco/test.exec")
+		include("**/jacoco/*.exec")
 	})
 }
 
@@ -141,7 +149,7 @@ tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
 	classDirectories.setFrom(files("$buildDir/classes/kotlin/main"))
 	sourceDirectories.setFrom(files("src/main/kotlin"))
 	executionData.setFrom(fileTree(buildDir) {
-		include("**/jacoco/test.exec")
+		include("**/jacoco/*.exec")
 	})
 }
 
@@ -183,7 +191,7 @@ tasks.register<JacocoReport>("jacocoUnitTestReport") {
 	}
 	classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main").get().asFile))
 	sourceDirectories.setFrom(files("src/main/kotlin"))
-	executionData.setFrom(fileTree(buildDirFile) { include("**/jacoco/test.exec") })
+	executionData.setFrom(fileTree(buildDirFile) { include("**/jacoco/*.exec") })
 }
 
 tasks.register<Test>("e2eTest") {
@@ -208,7 +216,7 @@ tasks.register<JacocoReport>("jacocoE2eTestReport") {
 	}
 	classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main").get().asFile))
 	sourceDirectories.setFrom(files("src/main/kotlin"))
-	executionData.setFrom(fileTree(buildDirFile) { include("**/jacoco/test.exec") })
+	executionData.setFrom(fileTree(buildDirFile) { include("**/jacoco/*.exec") })
 }
 
 tasks.register("listUnitTests") {
