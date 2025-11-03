@@ -85,11 +85,10 @@ tasks.withType<Test> {
 	}
 }
 
-// Configurar JaCoCo para que cada task Test escriba su propio .exec
 tasks.withType<Test>().configureEach {
     val testTaskName = name
     extensions.configure(org.gradle.testing.jacoco.plugins.JacocoTaskExtension::class.java) {
-        destinationFile = layout.buildDirectory.file("jacoco/$testTaskName.exec").get().asFile
+        setDestinationFile(layout.buildDirectory.file("jacoco/$testTaskName.exec").get().asFile)
     }
 }
 
@@ -107,9 +106,8 @@ tasks.named<JacocoReport>("jacocoTestReport") {
 	// Rutas correctas para Kotlin
 	classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main").get().asFile))
 	sourceDirectories.setFrom(files("src/main/kotlin"))
-	executionData.setFrom(fileTree(buildDirFile) {
-		include("**/jacoco/*.exec")
-	})
+	// Usar solo el .exec del task 'test' para que no mezcle con unit/e2e
+	executionData.setFrom(layout.buildDirectory.file("jacoco/test.exec"))
 }
 
 // --- BLOQUE 3: APLICAR FILTROS AL REPORTE ---
@@ -191,7 +189,7 @@ tasks.register<JacocoReport>("jacocoUnitTestReport") {
 	}
 	classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main").get().asFile))
 	sourceDirectories.setFrom(files("src/main/kotlin"))
-	executionData.setFrom(fileTree(buildDirFile) { include("**/jacoco/*.exec") })
+	executionData.setFrom(layout.buildDirectory.file("jacoco/unitTest.exec"))
 }
 
 tasks.register<Test>("e2eTest") {
@@ -216,7 +214,7 @@ tasks.register<JacocoReport>("jacocoE2eTestReport") {
 	}
 	classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main").get().asFile))
 	sourceDirectories.setFrom(files("src/main/kotlin"))
-	executionData.setFrom(fileTree(buildDirFile) { include("**/jacoco/*.exec") })
+	executionData.setFrom(layout.buildDirectory.file("jacoco/e2eTest.exec"))
 }
 
 tasks.register("listUnitTests") {
