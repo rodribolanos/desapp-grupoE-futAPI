@@ -1,12 +1,16 @@
-package ar.edu.unq.futapp.model
+package ar.edu.unq.futapp.unit.model
 
-import ar.edu.unq.futapp.builders.MatchBuilder
+import ar.edu.unq.futapp.model.Match
+import ar.edu.unq.futapp.model.StatisticalCalculator
+import ar.edu.unq.futapp.utils.builders.MatchBuilder
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import kotlin.test.assertTrue
 
+@ActiveProfiles("test")
 class StatisticalCalculatorTest {
 
     @Test

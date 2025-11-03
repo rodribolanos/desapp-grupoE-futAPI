@@ -1,10 +1,10 @@
-package ar.edu.unq.futapp.beans
+package ar.edu.unq.futapp.utils
 
+import ar.edu.unq.futapp.beans.WebBrowser
 import ar.edu.unq.futapp.model.HtmlElement
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.stereotype.Component
 import java.io.File
 import java.net.URI

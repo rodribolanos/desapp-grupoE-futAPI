@@ -1,19 +1,21 @@
-package ar.edu.unq.futapp.beans
+package ar.edu.unq.futapp.integration.beans
 
+import ar.edu.unq.futapp.beans.MatchExtractor
+import ar.edu.unq.futapp.model.Match
+import ar.edu.unq.futapp.utils.JsoupWebBrowser
 import ar.edu.unq.futapp.utils.MatchApiUtils
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import ar.edu.unq.futapp.model.Match
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ActiveProfiles("test")
+@ActiveProfiles("integration-test")
 class MatchExtractorTest {
 
     private lateinit var browser: JsoupWebBrowser
@@ -33,7 +35,11 @@ class MatchExtractorTest {
 
         val teamMatches = scraper.getLastMatchesFromUrl(browser, uri.toString())
 
-        assertEquals(expectedMatches.size, teamMatches.matches.size, "Should parse correct number of matches")
+        Assertions.assertEquals(
+            expectedMatches.size,
+            teamMatches.matches.size,
+            "Should parse correct number of matches"
+        )
 
         expectedMatches.forEachIndexed { index, expected ->
             val actual = teamMatches.matches[index]
@@ -49,11 +55,11 @@ class MatchExtractorTest {
 
         val teamMatches = scraper.getLastMatchesFromUrl(browser, uri.toString())
 
-        assertTrue(teamMatches.matches.isNotEmpty(), "Should have matches")
+        Assertions.assertTrue(teamMatches.matches.isNotEmpty(), "Should have matches")
 
         val firstMatch = teamMatches.matches[0]
-        assertEquals("Mallorca", firstMatch.homeTeam)
-        assertEquals("Barcelona", firstMatch.awayTeam)
+        Assertions.assertEquals("Mallorca", firstMatch.homeTeam)
+        Assertions.assertEquals("Barcelona", firstMatch.awayTeam)
     }
 
     @Test
@@ -65,8 +71,8 @@ class MatchExtractorTest {
         val teamMatches = scraper.getLastMatchesFromUrl(browser, uri.toString())
 
         val firstMatch = teamMatches.matches[0] // Mallorca 0-3 Barcelona
-        assertEquals(0, firstMatch.homeScore)
-        assertEquals(3, firstMatch.awayScore)
+        Assertions.assertEquals(0, firstMatch.homeScore)
+        Assertions.assertEquals(3, firstMatch.awayScore)
     }
 
     @Test
@@ -78,10 +84,10 @@ class MatchExtractorTest {
         val teamMatches = scraper.getLastMatchesFromUrl(browser, uri.toString())
 
         val awayMatch = teamMatches.matches[0] // Mallorca vs Barcelona (away)
-        assertFalse(awayMatch.isHomeMatch, "Mallorca vs Barcelona should be away match")
+        Assertions.assertFalse(awayMatch.isHomeMatch, "Mallorca vs Barcelona should be away match")
 
         val homeMatch = teamMatches.matches.first { it.homeTeam == "Barcelona" }
-        assertTrue(homeMatch.isHomeMatch, "Barcelona vs X should be home match")
+        Assertions.assertTrue(homeMatch.isHomeMatch, "Barcelona vs X should be home match")
     }
 
     @Test
@@ -93,7 +99,7 @@ class MatchExtractorTest {
         val teamMatches = scraper.getLastMatchesFromUrl(browser, uri.toString())
 
         val firstMatch = teamMatches.matches[0]
-        assertEquals(LocalDate.of(2025, 8, 16), firstMatch.date)
+        Assertions.assertEquals(LocalDate.of(2025, 8, 16), firstMatch.date)
     }
 
     @Test
@@ -107,7 +113,7 @@ class MatchExtractorTest {
         val matches = teamMatches.matches
 
         matches.forEach{ match ->
-            assertTrue(
+            Assertions.assertTrue(
                 match.homeScore >= 0 && match.awayScore >= 0,
                 "Match ${match.homeTeam} vs ${match.awayTeam} should have valid scores"
             )
@@ -131,17 +137,17 @@ class MatchExtractorTest {
             (match.isHomeMatch && match.homeScore < match.awayScore) || (!match.isHomeMatch && match.awayScore < match.homeScore)
         }
 
-        assertEquals(7, wins, "Should have 7 wins")
-        assertEquals(1, draws, "Should have 1 draw")
-        assertEquals(2, losses, "Should have 2 losses")
+        Assertions.assertEquals(7, wins, "Should have 7 wins")
+        Assertions.assertEquals(1, draws, "Should have 1 draw")
+        Assertions.assertEquals(2, losses, "Should have 2 losses")
     }
 
     private fun assertMatchEquals(expected: Match, actual: Match, message: String) {
-        assertEquals(expected.homeTeam, actual.homeTeam, "$message: home team mismatch")
-        assertEquals(expected.awayTeam, actual.awayTeam, "$message: away team mismatch")
-        assertEquals(expected.homeScore, actual.homeScore, "$message: home score mismatch")
-        assertEquals(expected.awayScore, actual.awayScore, "$message: away score mismatch")
-        assertEquals(expected.date, actual.date, "$message: date mismatch")
-        assertEquals(expected.isHomeMatch, actual.isHomeMatch, "$message: isHomeMatch mismatch")
+        Assertions.assertEquals(expected.homeTeam, actual.homeTeam, "$message: home team mismatch")
+        Assertions.assertEquals(expected.awayTeam, actual.awayTeam, "$message: away team mismatch")
+        Assertions.assertEquals(expected.homeScore, actual.homeScore, "$message: home score mismatch")
+        Assertions.assertEquals(expected.awayScore, actual.awayScore, "$message: away score mismatch")
+        Assertions.assertEquals(expected.date, actual.date, "$message: date mismatch")
+        Assertions.assertEquals(expected.isHomeMatch, actual.isHomeMatch, "$message: isHomeMatch mismatch")
     }
 }

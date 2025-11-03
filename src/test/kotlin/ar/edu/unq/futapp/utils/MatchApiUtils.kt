@@ -1,6 +1,6 @@
 package ar.edu.unq.futapp.utils
 
-import ar.edu.unq.futapp.builders.MatchBuilder
+import ar.edu.unq.futapp.utils.builders.MatchBuilder
 import ar.edu.unq.futapp.model.Match
 import java.io.File
 import java.net.URI

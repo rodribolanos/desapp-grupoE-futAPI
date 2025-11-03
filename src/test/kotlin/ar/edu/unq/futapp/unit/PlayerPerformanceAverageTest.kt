@@ -1,9 +1,12 @@
-package ar.edu.unq.futapp
+package ar.edu.unq.futapp.unit
 
-import ar.edu.unq.futapp.builders.PerformanceBuilder
-import ar.edu.unq.futapp.builders.PlayerPerformanceBuilder
-import org.junit.jupiter.api.Assertions.assertEquals
+import ar.edu.unq.futapp.utils.builders.PerformanceBuilder
+import ar.edu.unq.futapp.utils.builders.PlayerPerformanceBuilder
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.springframework.test.context.ActiveProfiles
+
+@ActiveProfiles("test")
 class PlayerPerformanceAverageTest {
 
     @Test
@@ -15,11 +18,11 @@ class PlayerPerformanceAverageTest {
 
         val result = player.averageSeasons()
 
-        assertEquals(0, result.totalAppareances)
-        assertEquals(0, result.totalGoals)
-        assertEquals(0, result.totalAssists)
-        assertEquals(0.0, result.averageAerialsWon)
-        assertEquals(0.0, result.averageRating)
+        Assertions.assertEquals(0, result.totalAppareances)
+        Assertions.assertEquals(0, result.totalGoals)
+        Assertions.assertEquals(0, result.totalAssists)
+        Assertions.assertEquals(0.0, result.averageAerialsWon)
+        Assertions.assertEquals(0.0, result.averageRating)
     }
 
     @Test
@@ -42,11 +45,11 @@ class PlayerPerformanceAverageTest {
 
         val result = player.averageSeasons()
 
-        assertEquals(30, result.totalAppareances)
-        assertEquals(25, result.totalGoals)
-        assertEquals(10, result.totalAssists)
-        assertEquals(2.5, result.averageAerialsWon)
-        assertEquals(8.8, result.averageRating)
+        Assertions.assertEquals(30, result.totalAppareances)
+        Assertions.assertEquals(25, result.totalGoals)
+        Assertions.assertEquals(10, result.totalAssists)
+        Assertions.assertEquals(2.5, result.averageAerialsWon)
+        Assertions.assertEquals(8.8, result.averageRating)
     }
 
     @Test
@@ -80,10 +83,10 @@ class PlayerPerformanceAverageTest {
 
         val result = player.averageSeasons()
 
-        assertEquals(29, result.totalAppareances)
-        assertEquals(15, result.totalGoals)
-        assertEquals(12, result.totalAssists)
-        assertEquals(1.75, result.averageAerialsWon)
-        assertEquals(8.15, result.averageRating)
+        Assertions.assertEquals(29, result.totalAppareances)
+        Assertions.assertEquals(15, result.totalGoals)
+        Assertions.assertEquals(12, result.totalAssists)
+        Assertions.assertEquals(1.75, result.averageAerialsWon)
+        Assertions.assertEquals(8.15, result.averageRating)
     }
 }
