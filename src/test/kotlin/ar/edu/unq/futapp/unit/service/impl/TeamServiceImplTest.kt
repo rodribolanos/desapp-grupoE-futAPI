@@ -19,8 +19,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.test.context.ActiveProfiles
 import java.util.Optional
 
+@ActiveProfiles("test")
 class TeamServiceImplTest {
 
     private lateinit var teamApiClient: WhoScoredApiClient

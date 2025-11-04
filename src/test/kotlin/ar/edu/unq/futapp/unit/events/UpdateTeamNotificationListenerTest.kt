@@ -11,6 +11,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.springframework.test.context.ActiveProfiles
 import java.util.*
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.Executors
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
+@ActiveProfiles("test")
 class UpdateTeamNotificationListenerTest {
 
     private val apiClient: WhoScoredApiClient = mockk()
