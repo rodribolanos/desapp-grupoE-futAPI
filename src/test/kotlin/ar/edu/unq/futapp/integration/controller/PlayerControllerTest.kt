@@ -1,11 +1,11 @@
 package ar.edu.unq.futapp.controller
 
-import ar.edu.unq.futapp.builders.PerformanceBuilder
-import ar.edu.unq.futapp.builders.PlayerPerformanceBuilder
 import ar.edu.unq.futapp.config.TestDataInitializer
 import ar.edu.unq.futapp.exception.EntityNotFound
 import ar.edu.unq.futapp.exception.InternalServerException
 import ar.edu.unq.futapp.service.PlayerService
+import ar.edu.unq.futapp.utils.builders.PerformanceBuilder
+import ar.edu.unq.futapp.utils.builders.PlayerPerformanceBuilder
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
