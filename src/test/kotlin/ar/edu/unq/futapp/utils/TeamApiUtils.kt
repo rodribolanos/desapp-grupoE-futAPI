@@ -49,4 +49,9 @@ object TeamApiUtils {
         name = "Boca Juniors",
         players = expectedPlayersForPlayerListPage().toMutableList()
     )
+
+    fun teamWithPlayers(name: String, players: List<Player>): Team = Team(
+        name = name,
+        players = players.toMutableList()
+    )
 }
