@@ -19,7 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Gradlew permissions
       - name: Give gradlew permissions
         run: chmod +x ./gradlew
 
@@ -29,14 +28,27 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # Configuración de Gradle con cache
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
-      # Compilación + tests
-      - name: Build with Gradle Wrapper
-        run: ./gradlew build
-
+      # Ejecuta el build Y la validación de cobertura
+      - name: Build and Verify Coverage
+        run: ./gradlew clean build jacocoTestCoverageVerification
+        
+      # Sube el reporte HTML (útil para depurar si falla)
+      - name: Upload JaCoCo HTML Report
+        uses: actions/upload-artifact@v4
+        if: always() 
+        with:
+          name: jacoco-html-report
+          path: build/reports/jacoco/test/html/
+          
+      # Sube el reporte XML a Codecov
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./build/reports/jacoco/test/jacocoTestReport.xml
+          
   dependency-submission:
     runs-on: ubuntu-latest
     permissions:
@@ -51,4 +63,4 @@ jobs:
           distribution: 'temurin'
 
       - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0

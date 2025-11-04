@@ -1,4 +1,4 @@
-package ar.edu.unq.futapp.controller
+package ar.edu.unq.futapp.integration.controller
 
 import ar.edu.unq.futapp.config.TestDataInitializer
 import ar.edu.unq.futapp.dto.RefreshRequestDTO
@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("integration-test")
 @Import(TestDataInitializer::class)
 class AuthControllerIntegrationTest {
     @Autowired

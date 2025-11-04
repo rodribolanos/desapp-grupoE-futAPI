@@ -1,4 +1,4 @@
-package ar.edu.unq.futapp.controller
+package ar.edu.unq.futapp.integration.controller
 
 import ar.edu.unq.futapp.config.TestDataInitializer
 import ar.edu.unq.futapp.model.Player
@@ -26,7 +26,7 @@ import org.hamcrest.Matchers.greaterThanOrEqualTo
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("integration-test")
 @Import(TestDataInitializer::class)
 class AuditControllerIntegrationTest {
     @Autowired
@@ -55,7 +55,7 @@ class AuditControllerIntegrationTest {
 
         val fakeTeam = Team(
             name = teamName,
-            players = listOf(
+            players = mutableListOf(
                 Player("Jugador 1", 10, 3, 2, 6.9),
                 Player("Jugador 2", 12, 5, 1, 7.1)
             )

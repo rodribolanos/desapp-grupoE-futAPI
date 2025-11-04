@@ -1,14 +1,20 @@
-package ar.edu.unq.futapp.beans
+package ar.edu.unq.futapp.integration.beans
 
+import ar.edu.unq.futapp.beans.InitialSearchExtractor
+import ar.edu.unq.futapp.utils.JsoupWebBrowser
 import ar.edu.unq.futapp.exception.EntityNotFound
 import ar.edu.unq.futapp.utils.TeamApiUtils
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Profile
+import org.springframework.test.context.ActiveProfiles
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
-@Profile(value = ["test"])
+@ActiveProfiles("integration-test")
 class InitialSearchExtractorTest {
     lateinit var browser : JsoupWebBrowser
     private val extractor = InitialSearchExtractor()
