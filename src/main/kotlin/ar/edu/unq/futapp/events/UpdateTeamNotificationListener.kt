@@ -18,8 +18,8 @@ class UpdateTeamNotificationListener(val teamApiClient: WhoScoredApiClient, val 
     @Async
     fun handleUpdateTeamEvent(event: UpdateTeamEvent) {
         val teamName = event.name
+        if(!tryRegister(teamName)) return
         try {
-            if(!tryRegister(teamName)) return
             val teamOpt = teamApiClient.findTeam(teamName)
             if (teamOpt.isPresent) {
                 teamRepository.save(teamOpt.get())
@@ -30,9 +30,9 @@ class UpdateTeamNotificationListener(val teamApiClient: WhoScoredApiClient, val 
         }
     }
 
-    fun tryRegister(teamName: String): Boolean = pending.add(teamName)
+    private fun tryRegister(teamName: String): Boolean = pending.add(teamName)
 
-    fun unregister(teamName: String) {
+    private fun unregister(teamName: String) {
         pending.remove(teamName)
     }
 }
