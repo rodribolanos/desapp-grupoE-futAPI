@@ -1,4 +1,4 @@
-package ar.edu.unq.futapp.builders
+package ar.edu.unq.futapp.utils.builders
 
 import ar.edu.unq.futapp.model.Match
 import java.time.LocalDate

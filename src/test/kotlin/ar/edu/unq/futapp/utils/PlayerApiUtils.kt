@@ -1,7 +1,7 @@
 package ar.edu.unq.futapp.utils
 
-import ar.edu.unq.futapp.builders.PerformanceBuilder
-import ar.edu.unq.futapp.builders.PlayerPerformanceBuilder
+import ar.edu.unq.futapp.utils.builders.PerformanceBuilder
+import ar.edu.unq.futapp.utils.builders.PlayerPerformanceBuilder
 import ar.edu.unq.futapp.model.Performance
 import ar.edu.unq.futapp.model.PlayerPerformance
 import java.io.File

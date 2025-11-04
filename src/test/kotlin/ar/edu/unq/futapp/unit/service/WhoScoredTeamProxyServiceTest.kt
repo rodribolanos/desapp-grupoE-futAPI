@@ -1,4 +1,4 @@
-package ar.edu.unq.futapp.service
+package ar.edu.unq.futapp.unit.service
 
 import ar.edu.unq.futapp.beans.*
 import ar.edu.unq.futapp.exception.EntityNotFound

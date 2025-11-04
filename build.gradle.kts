@@ -56,6 +56,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     testImplementation("org.jsoup:jsoup:1.21.2")
     testImplementation("io.mockk:mockk:1.14.5")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
 
 kotlin {
@@ -70,13 +71,26 @@ allOpen {
 	annotation("jakarta.persistence.Embeddable")
 }
 
+// referencia segura a buildDirectory
+val buildDirFile = layout.buildDirectory.get().asFile
+
 // --- BLOQUE 1: CONFIGURACIÓN DE TESTS ---
 tasks.withType<Test> {
 	useJUnitPlatform()
 	jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
 
-	// Correcto: asegura que el reporte se genere al finalizar los tests
-	finalizedBy(tasks.named("jacocoTestReport"))
+	testLogging {
+		events("started", "passed", "skipped", "failed")
+		exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+		showStandardStreams = true
+	}
+}
+
+tasks.withType<Test>().configureEach {
+    val testTaskName = name
+    extensions.configure(org.gradle.testing.jacoco.plugins.JacocoTaskExtension::class.java) {
+        setDestinationFile(layout.buildDirectory.file("jacoco/$testTaskName.exec").get().asFile)
+    }
 }
 
 
@@ -91,11 +105,10 @@ tasks.named<JacocoReport>("jacocoTestReport") {
 	}
 
 	// Rutas correctas para Kotlin
-	classDirectories.setFrom(files("$buildDir/classes/kotlin/main"))
+	classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main").get().asFile))
 	sourceDirectories.setFrom(files("src/main/kotlin"))
-	executionData.setFrom(fileTree(buildDir) {
-		include("**/jacoco/test.exec")
-	})
+	// Usar solo el .exec del task 'test' para que no mezcle con unit/e2e
+	executionData.setFrom(layout.buildDirectory.file("jacoco/test.exec"))
 }
 
 // --- BLOQUE 3: APLICAR FILTROS AL REPORTE ---
@@ -135,7 +148,7 @@ tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
 	classDirectories.setFrom(files("$buildDir/classes/kotlin/main"))
 	sourceDirectories.setFrom(files("src/main/kotlin"))
 	executionData.setFrom(fileTree(buildDir) {
-		include("**/jacoco/test.exec")
+		include("**/jacoco/*.exec")
 	})
 }
 
@@ -152,5 +165,91 @@ afterEvaluate {
 				)
 			}
 		}))
+	}
+}
+
+tasks.register<Test>("unitTest") {
+	group = "verification"
+	description = "Ejecuta los tests unitarios (excluye Integration/E2E)."
+	useJUnitPlatform()
+	jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
+
+	include("**/ar/**/unit/**")
+    exclude("**/ar/**/integration/**")
+
+	finalizedBy("jacocoUnitTestReport")
+}
+
+tasks.register<JacocoReport>("jacocoUnitTestReport") {
+	group = "verification"
+	description = "Genera reporte JaCoCo para unitTest"
+	dependsOn(tasks.named<Test>("unitTest"))
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+	classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main").get().asFile))
+	sourceDirectories.setFrom(files("src/main/kotlin"))
+	executionData.setFrom(layout.buildDirectory.file("jacoco/unitTest.exec"))
+}
+
+tasks.register<Test>("e2eTest") {
+	group = "verification"
+	description = "Ejecuta los tests de integración / e2e (IntegrationTest/E2ETest)."
+	useJUnitPlatform()
+	jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
+
+	include("**/ar/**/integration/**")
+    exclude("**/ar/**/unit/**")
+
+	finalizedBy("jacocoE2eTestReport")
+}
+
+tasks.register<JacocoReport>("jacocoE2eTestReport") {
+	group = "verification"
+	description = "Genera reporte JaCoCo para e2eTest"
+	dependsOn(tasks.named<Test>("e2eTest"))
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+	classDirectories.setFrom(files(layout.buildDirectory.dir("classes/kotlin/main").get().asFile))
+	sourceDirectories.setFrom(files("src/main/kotlin"))
+	executionData.setFrom(layout.buildDirectory.file("jacoco/e2eTest.exec"))
+}
+
+tasks.register("listUnitTests") {
+	group = "verification"
+	description = "Lista las clases de test que coinciden con el patrón de unitTest"
+	doLast {
+		val classesDir = layout.buildDirectory.dir("classes/kotlin/test").get().asFile
+		if (!classesDir.exists()) {
+			println("Directorios de clases de test no encontrados: ${classesDir}. Ejecutá 'gradle test' para compilar tests primero.")
+			return@doLast
+		}
+		val matched = fileTree(classesDir).matching {
+			include("**/ar/**/unit/**")
+            exclude("**/ar/**/integration/**")
+		}.files.sorted()
+		println("unitTest matched classes: ${matched.size}")
+		matched.forEach { println(it.relativeTo(classesDir).path) }
+	}
+}
+
+tasks.register("listE2eTests") {
+	group = "verification"
+	description = "Lista las clases de test que coinciden con el patrón de e2eTest"
+	doLast {
+		val classesDir = layout.buildDirectory.dir("classes/kotlin/test").get().asFile
+		if (!classesDir.exists()) {
+			println("Directorios de clases de test no encontrados: ${classesDir}. Ejecutá 'gradle test' para compilar tests primero.")
+			return@doLast
+		}
+		val matched = fileTree(classesDir).matching {
+			include("**/ar/**/integration/**")
+			exclude("**/ar/**/unit/**")
+		}.files.sorted()
+		println("e2eTest matched classes: ${matched.size}")
+		matched.forEach { println(it.relativeTo(classesDir).path) }
 	}
 }

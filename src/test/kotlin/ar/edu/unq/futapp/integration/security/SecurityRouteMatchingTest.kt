@@ -1,4 +1,4 @@
-package ar.edu.unq.futapp.security
+package ar.edu.unq.futapp.integration.security
 
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("integration-test")
 class SecurityRouteMatchingTest {
 
     @Autowired

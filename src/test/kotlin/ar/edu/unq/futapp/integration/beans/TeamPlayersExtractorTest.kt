@@ -1,15 +1,20 @@
-package ar.edu.unq.futapp.beans
+package ar.edu.unq.futapp.integration.beans
 
+import ar.edu.unq.futapp.beans.TeamPlayersExtractor
 import ar.edu.unq.futapp.exception.ParsingException
+import ar.edu.unq.futapp.utils.JsoupWebBrowser
 import ar.edu.unq.futapp.utils.TeamApiUtils
-import org.junit.jupiter.api.*
-import org.springframework.beans.factory.annotation.Autowired
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ActiveProfiles("test")
+@ActiveProfiles("integration-test")
 class TeamPlayersExtractorTest {
     lateinit var browser : JsoupWebBrowser
     private val extractor = TeamPlayersExtractor()

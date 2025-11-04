@@ -1,8 +1,6 @@
-package ar.edu.unq.futapp.utils
+package ar.edu.unq.futapp.utils.builders
 
 import ar.edu.unq.futapp.model.User
-import org.springframework.security.crypto.password.PasswordEncoder
-
 
 class UserBuilder() {
     private var username: String = "testUser1"
