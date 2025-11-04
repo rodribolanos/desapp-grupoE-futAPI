@@ -54,6 +54,7 @@ dependencies {
     implementation("org.seleniumhq.selenium:selenium-java:4.35.0")
     testImplementation("org.jsoup:jsoup:1.21.2")
     testImplementation("io.mockk:mockk:1.14.5")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
 
 kotlin {
