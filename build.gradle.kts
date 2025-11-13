@@ -57,6 +57,7 @@ dependencies {
     testImplementation("org.jsoup:jsoup:1.21.2")
     testImplementation("io.mockk:mockk:1.14.5")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
+	testImplementation("com.tngtech.archunit:archunit:1.4.1")
 }
 
 kotlin {
