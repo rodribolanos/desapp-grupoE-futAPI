@@ -33,7 +33,6 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-aop")
@@ -57,6 +56,7 @@ dependencies {
     testImplementation("org.jsoup:jsoup:1.21.2")
     testImplementation("io.mockk:mockk:1.14.5")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
+    implementation("org.springframework.boot:spring-boot-starter-actuator:3.5.7")
 }
 
 kotlin {
