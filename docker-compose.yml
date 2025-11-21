@@ -14,6 +14,8 @@ services:
       timeout: 5s
       retries: 30
       start_period: 10s
+    networks:
+      - monitor-net
 
   futapp:
     build:
@@ -27,4 +29,23 @@ services:
     depends_on:
       selenium:
         condition: service_healthy
+    networks:
+      - monitor-net
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090" # Puerto para acceder a la UI de Prometheus
+    volumes:
+      # Monta el archivo de configuración local en el path interno de Prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - monitor-net # Debe estar en la misma red que futapp
+
+networks:
+  monitor-net:
+    driver: bridge
