@@ -1,10 +1,7 @@
 package ar.edu.unq.futapp.controller
 
-import ar.edu.unq.futapp.dto.AuthResponseDTO
-import ar.edu.unq.futapp.dto.ExceptionDTO
-import ar.edu.unq.futapp.dto.PlayerDTO
-import ar.edu.unq.futapp.dto.UpcomingMatchDTO
-import ar.edu.unq.futapp.dto.toDTO
+import ar.edu.unq.futapp.dto.*
+import ar.edu.unq.futapp.model.AdvancedMetric
 import ar.edu.unq.futapp.service.impl.TeamServiceImpl
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -91,5 +88,42 @@ class TeamController {
     ): ResponseEntity<List<UpcomingMatchDTO>> {
         val matches = teamService.findUpcomingFixturesByTeam(teamName)
         return ResponseEntity.ok(matches.toDTO())
+    }
+
+
+    @Operation(summary = "Get advanced metrics for a team in a country",
+        description = "Returns advanced statistics for the specified team within the specified country.",
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved advanced metrics",
+                content = [Content(schema = Schema(implementation = AdvancedMetric::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Team or country not found",
+                content = [Content(schema = Schema(implementation = ExceptionDTO::class))]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Parsing exception",
+                content = [Content(schema = Schema(implementation = ExceptionDTO::class))]
+            )
+        ]
+    )
+    @GetMapping("/{country}/{teamName}/statistics")
+    fun advancedMetricsForTeamInCountry(
+        @PathVariable("country")
+        @NotBlank(message = "country must not be empty or null")
+        country: String,
+        @PathVariable("teamName")
+        @NotBlank(message = "teamName must not be empty or null")
+        teamName: String
+    ): ResponseEntity<AdvancedMetricDTO> {
+        val stats = teamService.getAdvancedMetricsForTeamAndCountry(teamName, country)
+        return ResponseEntity.ok(stats.toDTO())
     }
 }

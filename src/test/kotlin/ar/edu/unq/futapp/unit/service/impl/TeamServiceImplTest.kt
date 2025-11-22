@@ -4,6 +4,7 @@ import ar.edu.unq.futapp.events.UpdateTeamEvent
 import ar.edu.unq.futapp.exception.EntityNotFound
 import ar.edu.unq.futapp.model.Player
 import ar.edu.unq.futapp.repository.TeamRepository
+import ar.edu.unq.futapp.service.FootballApiClient
 import ar.edu.unq.futapp.service.WhoScoredApiClient
 import ar.edu.unq.futapp.service.impl.TeamServiceImpl
 import ar.edu.unq.futapp.utils.TeamApiUtils
@@ -28,6 +29,7 @@ class TeamServiceImplTest {
     private lateinit var teamApiClient: WhoScoredApiClient
     private lateinit var teamRepository: TeamRepository
     private lateinit var eventPublisher: ApplicationEventPublisher
+    private lateinit var footballApi: FootballApiClient
     private lateinit var service: TeamServiceImpl
 
     @BeforeEach
@@ -35,7 +37,8 @@ class TeamServiceImplTest {
         teamApiClient = mockk()
         teamRepository = mockk()
         eventPublisher = mockk(relaxed = true)
-        service = TeamServiceImpl(teamApiClient, teamRepository, eventPublisher)
+        footballApi = mockk()
+        service = TeamServiceImpl(teamApiClient, teamRepository, eventPublisher, footballApi)
     }
 
     @Test
