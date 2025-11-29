@@ -1,5 +1,7 @@
 package ar.edu.unq.futapp.audit
 
+import ar.edu.unq.futapp.beans.JwtUtil
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.apache.logging.log4j.LogManager
 import org.aspectj.lang.ProceedingJoinPoint
@@ -18,7 +20,7 @@ import kotlin.reflect.full.findAnnotation
 
 @Aspect
 @Component
-class HttpAuditLogAspect {
+class HttpAuditLogAspect(private val jwtUtil: JwtUtil) {
     private val logger = LogManager.getLogger(HttpAuditLogAspect::class.java)
 
     private data class PropertyMeta(
@@ -33,9 +35,10 @@ class HttpAuditLogAspect {
         val startNs = System.nanoTime()
         val ts = Instant.now().toString()
 
-        val (method, path) = currentHttpMethodAndPath()
+        val req = currentRequest()
+        val (method, path) = currentHttpMethodAndPath(req)
         val params = redactParams(pjp)
-        val user = currentUserOrAnonymous()
+        val user = currentUserOrAnonymous(req)
 
         return try {
             val result = pjp.proceed()
@@ -122,9 +125,8 @@ class HttpAuditLogAspect {
         return if (k != null && isSensitiveName(k)) "***" else value
     }
 
-    private fun currentHttpMethodAndPath(): Pair<String, String> {
+    private fun currentHttpMethodAndPath(req: HttpServletRequest?): Pair<String, String> {
         return try {
-            val req = (RequestContextHolder.getRequestAttributes() as? ServletRequestAttributes)?.request
             if (req != null) {
                 val method = req.method ?: "UNKNOWN"
                 val uri = req.requestURI ?: req.requestURL?.toString() ?: "-"
@@ -134,6 +136,9 @@ class HttpAuditLogAspect {
             } else "UNKNOWN" to "-"
         } catch (_: Throwable) { "UNKNOWN" to "-" }
     }
+
+    private fun currentRequest(): HttpServletRequest? =
+        (RequestContextHolder.getRequestAttributes() as? ServletRequestAttributes)?.request
 
     private fun currentResponse(): HttpServletResponse? =
         (RequestContextHolder.getRequestAttributes() as? ServletRequestAttributes)?.response
@@ -145,7 +150,15 @@ class HttpAuditLogAspect {
         }
     }
 
-    private fun currentUserOrAnonymous(): String {
+    private fun currentUserOrAnonymous(request: HttpServletRequest?): String {
+        request?.getHeader("Authorization")?.let { header ->
+            if (header.startsWith("Bearer ")) {
+                val token = header.substring(7)
+                jwtUtil.getUsername(token).orElse(null)?.let {
+                    return it
+                }
+            }
+        }
         return try {
             val contextClass = Class.forName("org.springframework.security.core.context.SecurityContextHolder")
             val ctx = contextClass.getMethod("getContext").invoke(null)
