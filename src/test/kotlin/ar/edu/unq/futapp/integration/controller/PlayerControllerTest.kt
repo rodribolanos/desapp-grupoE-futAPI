@@ -1,4 +1,4 @@
-package ar.edu.unq.futapp.controller
+package ar.edu.unq.futapp.integration.controller
 
 import ar.edu.unq.futapp.config.TestDataInitializer
 import ar.edu.unq.futapp.exception.EntityNotFound
