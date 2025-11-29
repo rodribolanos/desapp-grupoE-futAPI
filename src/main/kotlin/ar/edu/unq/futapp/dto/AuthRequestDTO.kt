@@ -1,6 +1,7 @@
 package ar.edu.unq.futapp.dto
 
 import ar.edu.unq.futapp.model.AuthRequest
+import ar.edu.unq.futapp.audit.Sensitive
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
@@ -10,6 +11,7 @@ data class AuthRequestDTO(
     val username: String,
     @field:NotBlank(message = "La contraseña no puede estar vacía")
     @field:Size(min = 8, max = 100, message = "La contraseña debe tener entre 8 y 100 caracteres")
+    @field:Sensitive
     val password: String
 ) {
     fun toModel() = AuthRequest(username, password)
