@@ -1,0 +1,61 @@
+package ar.edu.unq.futapp.service.impl
+
+import ar.edu.unq.futapp.exception.EntityNotFound
+import ar.edu.unq.futapp.model.Comparison
+import ar.edu.unq.futapp.model.ProcessStatus
+import ar.edu.unq.futapp.model.Status
+import ar.edu.unq.futapp.model.TeamComparisonResult
+import ar.edu.unq.futapp.repository.ProcessStatusRepository
+import ar.edu.unq.futapp.service.TaskService
+import ar.edu.unq.futapp.service.TeamService
+import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.transaction.Transactional
+import org.springframework.scheduling.annotation.Async
+import org.springframework.stereotype.Service
+import java.util.UUID
+
+@Service
+@Transactional
+class TaskServiceImpl(
+    private val processRepository: ProcessStatusRepository,
+    private val objectMapper: ObjectMapper,
+    private val teamService: TeamService,
+):TaskService {
+
+    override fun startTeamComparisonTask(team1: String, team2: String): ProcessStatus {
+        val taskId = UUID.randomUUID().toString()
+        var initialStatus = ProcessStatus(id = taskId, status = Status.IN_PROCESS)
+
+        initialStatus = processRepository.save(initialStatus)
+
+        performComparisonTask(taskId, team1, team2)
+
+        return initialStatus
+    }
+
+    @Async
+    override fun performComparisonTask(taskId: String, team1: String, team2: String): Unit {
+        val currentStatus = this.getProcessStatusById(taskId)
+
+        try {
+            val comparison: TeamComparisonResult = teamService.compareTeams(team1, team2)
+            val resultJson = objectMapper.writeValueAsString(comparison)
+
+            currentStatus.resultJson = resultJson
+            currentStatus.status = Status.FINISHED
+
+            processRepository.save(currentStatus)
+        } catch (e: Exception) {
+            currentStatus.status = Status.FAILED
+            currentStatus.errorMessage = e.message
+            processRepository.save(currentStatus)
+        }
+
+    }
+
+    override fun getProcessStatusById(taskId: String): ProcessStatus {
+        return processRepository.findById(taskId).orElseThrow {
+            EntityNotFound("No process found with id $taskId")
+        }
+    }
+}
