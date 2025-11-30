@@ -40,4 +40,7 @@ class TeamServiceImpl @Autowired constructor(
         if (matchesOpt.isEmpty) throw EntityNotFound("Team with name $teamName not found")
         return matchesOpt.get()
     }
+
+    override fun compareTeams(team1: String, team2: String) =
+        teamApiClient.compareTeams(team1, team2)
 }
