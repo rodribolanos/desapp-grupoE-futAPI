@@ -2,9 +2,7 @@ package ar.edu.unq.futapp.service.impl
 
 import ar.edu.unq.futapp.events.UpdateTeamEvent
 import ar.edu.unq.futapp.exception.EntityNotFound
-import ar.edu.unq.futapp.model.Player
-import ar.edu.unq.futapp.model.Team
-import ar.edu.unq.futapp.model.UpcomingMatch
+import ar.edu.unq.futapp.model.*
 import ar.edu.unq.futapp.repository.TeamRepository
 import ar.edu.unq.futapp.service.WhoScoredApiClient
 import ar.edu.unq.futapp.service.TeamService
@@ -41,6 +39,9 @@ class TeamServiceImpl @Autowired constructor(
         return matchesOpt.get()
     }
 
-    override fun compareTeams(team1: String, team2: String) =
-        teamApiClient.compareTeams(team1, team2)
+    override fun compareTeams(team1: String, team2: String): TeamComparisonResult? {
+//        var team1Stats: TeamStats = teamApiClient.findTeamStats(team1)
+//        var team2Stats: TeamStats = teamApiClient.findTeamStats(team2)
+        return null
+    }
 }

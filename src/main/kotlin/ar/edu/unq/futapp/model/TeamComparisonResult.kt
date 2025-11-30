@@ -8,7 +8,7 @@ data class TeamComparisonResult(
 
 data class Comparison(
     val goalsAverage: ComparisonResult,
-    val shootsAverage: ComparisonResult,
+    val shotsAverage: ComparisonResult,
     val fairPlay: ComparisonResult,
     val posession: ComparisonResult,
     val passAccuracy: ComparisonResult,

@@ -1,7 +1,6 @@
 package ar.edu.unq.futapp.service.impl
 
 import ar.edu.unq.futapp.exception.EntityNotFound
-import ar.edu.unq.futapp.model.Comparison
 import ar.edu.unq.futapp.model.ProcessStatus
 import ar.edu.unq.futapp.model.Status
 import ar.edu.unq.futapp.model.TeamComparisonResult
@@ -11,6 +10,7 @@ import ar.edu.unq.futapp.service.TeamService
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.transaction.Transactional
 import org.springframework.scheduling.annotation.Async
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -21,6 +21,7 @@ class TaskServiceImpl(
     private val objectMapper: ObjectMapper,
     private val teamService: TeamService,
 ):TaskService {
+    val RETENTION_MILLIS: Long = 12 * 60 * 60 * 1000 // 12 hours
 
     override fun startTeamComparisonTask(team1: String, team2: String): ProcessStatus {
         val taskId = UUID.randomUUID().toString()
@@ -34,11 +35,11 @@ class TaskServiceImpl(
     }
 
     @Async
-    override fun performComparisonTask(taskId: String, team1: String, team2: String): Unit {
+    override fun performComparisonTask(taskId: String, team1: String, team2: String):   Unit {
         val currentStatus = this.getProcessStatusById(taskId)
 
         try {
-            val comparison: TeamComparisonResult = teamService.compareTeams(team1, team2)
+            val comparison: TeamComparisonResult? = teamService.compareTeams(team1, team2)
             val resultJson = objectMapper.writeValueAsString(comparison)
 
             currentStatus.resultJson = resultJson
@@ -57,5 +58,14 @@ class TaskServiceImpl(
         return processRepository.findById(taskId).orElseThrow {
             EntityNotFound("No process found with id $taskId")
         }
+    }
+
+    @Scheduled(fixedRate = 3600000) // 3,600,000 ms = 1 hora
+    @Transactional
+    fun cleanupOldProcesses() {
+        val cutoffTime = System.currentTimeMillis() - RETENTION_MILLIS
+        val deletedCount = processRepository.deleteOldFinishedOrFailedProcesses(cutoffTime)
+        println("Cleanup ran. Records deleted: $deletedCount (Cutoff: $cutoffTime)")
+
     }
 }

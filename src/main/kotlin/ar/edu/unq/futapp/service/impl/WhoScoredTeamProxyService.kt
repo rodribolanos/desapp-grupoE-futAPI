@@ -21,7 +21,8 @@ class WhoScoredTeamProxyService @Autowired constructor(
     private val webBrowserFactory: WebBrowserFactory,
     private val playerPerformanceExtractor: PlayerPerformanceExtractor,
     private val lastMatchesExtractor: MatchExtractor,
-    private val teamFixturesExtractor: TeamFixturesExtractor
+    private val teamFixturesExtractor: TeamFixturesExtractor,
+    private val teamMetricsExtractor: TeamMetricsExtractor
 ): WhoScoredApiClient {
     override fun findTeam(teamName: String): Optional<Team> {
         val browser = webBrowserFactory.create(headless = true)
@@ -75,6 +76,21 @@ class WhoScoredTeamProxyService @Autowired constructor(
             val teamUrl = initialSearchExtractor.getFirstTeamUrl(browser, teamName).replace("show", "fixtures")
             val teamMatches = lastMatchesExtractor.getLastMatchesFromUrl(browser, teamUrl)
             return teamMatches
+        } catch (e: EntityNotFound) {
+            throw e
+        } catch (e: Exception) {
+            throw InternalServerException(e.message)
+        } finally {
+            browser.close()
+        }
+    }
+
+    override fun findTeamMetrics(team: String): TeamMetrics {
+        val browser = webBrowserFactory.create(headless = true)
+        try {
+            val teamUrl = initialSearchExtractor.getFirstTeamUrl(browser, team)
+            val teamMetrics = teamMetricsExtractor.getTeamMetricsFromUrl(browser, teamUrl)
+            return teamMetrics
         } catch (e: EntityNotFound) {
             throw e
         } catch (e: Exception) {

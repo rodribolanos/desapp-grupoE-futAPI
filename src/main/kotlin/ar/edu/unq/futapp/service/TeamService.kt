@@ -7,5 +7,5 @@ import ar.edu.unq.futapp.model.UpcomingMatch
 interface TeamService {
     fun findPlayersByTeam(teamName: String): List<Player>
     fun findUpcomingFixturesByTeam(teamName: String): List<UpcomingMatch>
-    fun compareTeams(team1: String, team2: String): TeamComparisonResult
+    fun compareTeams(team1: String, team2: String): TeamComparisonResult?
 }
