@@ -144,6 +144,6 @@ class TeamController {
         team2: String
     ): ResponseEntity<ProcessStatusDTO> {
         val processStatus: ProcessStatus = taskService.startTeamComparisonTask(team1, team2)
-        return ResponseEntity.ok(processStatus.toDTO(objectMapper))
+        return ResponseEntity.accepted().body(processStatus.toDTO(objectMapper))
     }
 }
