@@ -8,22 +8,24 @@ import ar.edu.unq.futapp.repository.ProcessStatusRepository
 import ar.edu.unq.futapp.service.TaskService
 import ar.edu.unq.futapp.service.TeamService
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.transaction.Transactional
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
+import java.time.Instant
 import java.util.UUID
 
 @Service
-@Transactional
 class TaskServiceImpl(
     private val processRepository: ProcessStatusRepository,
     private val objectMapper: ObjectMapper,
     private val teamService: TeamService,
     private val selfProxy: ObjectProvider<TaskService>
 ):TaskService {
-    val RETENTION_MILLIS: Long = 12 * 60 * 60 * 1000 // 12 hours
+    val RETENTION_DURATION: Duration = Duration.ofHours(12)
 
     override fun startTeamComparisonTask(team1: String, team2: String): ProcessStatus {
         val taskId = UUID.randomUUID().toString()
@@ -39,6 +41,7 @@ class TaskServiceImpl(
     }
 
     @Async
+    @Transactional
     override fun performComparisonTask(taskId: String, team1: String, team2: String):   Unit {
         val currentStatus = this.getProcessStatusById(taskId)
 
@@ -51,15 +54,17 @@ class TaskServiceImpl(
 
             processRepository.save(currentStatus)
         } catch (e: Exception) {
+            println("Fallo aca" + e.message)
             selfProxy.getObject().handleComparisonFailure(currentStatus, e)
         }
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun handleComparisonFailure(currentStatus: ProcessStatus, exception: Exception) {
         currentStatus.status = Status.FAILED
         currentStatus.errorMessage = exception.message ?: "Unknown error"
         processRepository.save(currentStatus)
+        println("guarde bien el proceso")
     }
 
     override fun getProcessStatusById(taskId: String): ProcessStatus {
@@ -68,12 +73,12 @@ class TaskServiceImpl(
         }
     }
 
-    @Scheduled(fixedRate = 3600000) // 3,600,000 ms = 1 hora
+    @Scheduled(fixedRate = 3600000)
     @Transactional
     fun cleanupOldProcesses() {
-        val cutoffTime = System.currentTimeMillis() - RETENTION_MILLIS
+        val cutoffTime = Instant.now().minus(RETENTION_DURATION)
+
         val deletedCount = processRepository.deleteOldFinishedOrFailedProcesses(cutoffTime)
         println("Cleanup ran. Records deleted: $deletedCount (Cutoff: $cutoffTime)")
-
     }
 }

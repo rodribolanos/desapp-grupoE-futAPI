@@ -4,13 +4,14 @@ import ar.edu.unq.futapp.model.ProcessStatus
 import ar.edu.unq.futapp.model.Status
 import ar.edu.unq.futapp.model.TeamComparisonResult
 import com.fasterxml.jackson.databind.ObjectMapper
+import java.time.Instant
 
 data class ProcessStatusDTO(
     val id: String,
     val status: Status,
     val comparison: TeamComparisonResult? = null,
     val errorMessage: String? = null,
-    val createdAt: Long
+    val createdAt: Instant
 )
 
 

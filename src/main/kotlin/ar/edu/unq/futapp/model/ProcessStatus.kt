@@ -6,10 +6,11 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.Instant
 
 @Entity
 @Table(name = "async_process_status")
-class ProcessStatus(
+data class ProcessStatus(
     @Id
     val id: String,
     @Enumerated(EnumType.STRING)
@@ -17,5 +18,5 @@ class ProcessStatus(
     @Column(columnDefinition = "TEXT")
     var resultJson: String? = null,
     var errorMessage: String? = null,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Instant = Instant.now()
 )
