@@ -54,7 +54,6 @@ class TaskServiceImpl(
 
             processRepository.save(currentStatus)
         } catch (e: Exception) {
-            println("Fallo aca" + e.message)
             selfProxy.getObject().handleComparisonFailure(currentStatus, e)
         }
     }
@@ -64,7 +63,6 @@ class TaskServiceImpl(
         currentStatus.status = Status.FAILED
         currentStatus.errorMessage = exception.message ?: "Unknown error"
         processRepository.save(currentStatus)
-        println("guarde bien el proceso")
     }
 
     override fun getProcessStatusById(taskId: String): ProcessStatus {
