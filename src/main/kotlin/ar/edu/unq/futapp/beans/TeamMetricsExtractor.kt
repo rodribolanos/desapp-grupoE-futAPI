@@ -106,11 +106,14 @@ class TeamMetricsExtractor {
     }
 
     private fun extractFairPlay(disciplineContainer: HtmlElement): FairPlay {
-        val yellowCardsText = disciplineContainer.queryAll("span.yellow-card-box").firstOrNull()?.text()
-        val redCardsText = disciplineContainer.queryAll("span.red-card-box").firstOrNull()?.text()
+        val yellowCardsRaw = disciplineContainer.queryAll("span.yellow-card-box").firstOrNull()?.text()
+        val redCardsRaw = disciplineContainer.queryAll("span.red-card-box").firstOrNull()?.text()
 
-        val yellowCards = yellowCardsText?.toIntOrNull() ?: 0
-        val redCards = redCardsText?.toIntOrNull() ?: 0
+        val yellowCardsClean = yellowCardsRaw?.replace(Regex("<.*?>"), "")?.trim()
+        val redCardsClean = redCardsRaw?.replace(Regex("<.*?>"), "")?.trim()
+
+        val yellowCards = yellowCardsClean?.toIntOrNull() ?: 0
+        val redCards = redCardsClean?.toIntOrNull() ?: 0
 
         return FairPlay(redCards = redCards, yellowCards = yellowCards)
     }

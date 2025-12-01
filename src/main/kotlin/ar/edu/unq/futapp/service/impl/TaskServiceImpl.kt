@@ -9,6 +9,7 @@ import ar.edu.unq.futapp.service.TaskService
 import ar.edu.unq.futapp.service.TeamService
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.transaction.Transactional
+import org.springframework.beans.factory.ObjectProvider
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -20,6 +21,7 @@ class TaskServiceImpl(
     private val processRepository: ProcessStatusRepository,
     private val objectMapper: ObjectMapper,
     private val teamService: TeamService,
+    private val selfProxy: ObjectProvider<TaskService>
 ):TaskService {
     val RETENTION_MILLIS: Long = 12 * 60 * 60 * 1000 // 12 hours
 
@@ -29,9 +31,11 @@ class TaskServiceImpl(
 
         initialStatus = processRepository.save(initialStatus)
 
-        performComparisonTask(taskId, team1, team2)
+        selfProxy.getObject().performComparisonTask(taskId, team1, team2)
 
-        return initialStatus
+        val responseStatus = initialStatus.copy(status = Status.NOT_STARTED)
+
+        return responseStatus
     }
 
     @Async
@@ -39,7 +43,7 @@ class TaskServiceImpl(
         val currentStatus = this.getProcessStatusById(taskId)
 
         try {
-            val comparison: TeamComparisonResult? = teamService.compareTeams(team1, team2)
+            val comparison: TeamComparisonResult = teamService.compareTeams(team1, team2)
             val resultJson = objectMapper.writeValueAsString(comparison)
 
             currentStatus.resultJson = resultJson
@@ -47,11 +51,15 @@ class TaskServiceImpl(
 
             processRepository.save(currentStatus)
         } catch (e: Exception) {
-            currentStatus.status = Status.FAILED
-            currentStatus.errorMessage = e.message
-            processRepository.save(currentStatus)
+            selfProxy.getObject().handleComparisonFailure(currentStatus, e)
         }
+    }
 
+    @Transactional
+    override fun handleComparisonFailure(currentStatus: ProcessStatus, exception: Exception) {
+        currentStatus.status = Status.FAILED
+        currentStatus.errorMessage = exception.message ?: "Unknown error"
+        processRepository.save(currentStatus)
     }
 
     override fun getProcessStatusById(taskId: String): ProcessStatus {

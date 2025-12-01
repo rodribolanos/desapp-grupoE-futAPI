@@ -39,9 +39,15 @@ class TeamServiceImpl @Autowired constructor(
         return matchesOpt.get()
     }
 
-    override fun compareTeams(team1: String, team2: String): TeamComparisonResult? {
-//        var team1Stats: TeamStats = teamApiClient.findTeamStats(team1)
-//        var team2Stats: TeamStats = teamApiClient.findTeamStats(team2)
-        return null
+    override fun compareTeams(team1: String, team2: String): TeamComparisonResult {
+        val team1Stats: TeamMetrics = teamApiClient.findTeamMetrics(team1)
+        val team2Stats: TeamMetrics = teamApiClient.findTeamMetrics(team2)
+
+        val comparison = TeamComparisonResult(
+            team1 = team1Stats.teamName,
+            team2 = team2Stats.teamName,
+            comparisonData = team1Stats.compareTo(team2Stats)
+        )
+        return comparison
     }
 }
