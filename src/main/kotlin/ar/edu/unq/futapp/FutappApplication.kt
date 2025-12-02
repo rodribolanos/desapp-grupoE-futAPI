@@ -17,3 +17,5 @@ class FutappApplication
 fun main(args: Array<String>) {
     runApplication<FutappApplication>(*args)
 }
+
+// Trying testing!
