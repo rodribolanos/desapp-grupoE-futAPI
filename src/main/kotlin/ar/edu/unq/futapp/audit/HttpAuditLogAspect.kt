@@ -78,21 +78,21 @@ class HttpAuditLogAspect(private val jwtUtil: JwtUtil) {
                 entries
             } catch (_: Throwable) { "<unprintable-map>" }
         }
-
+        val unprintable = "<unprintable>"
         return try {
             val kClass = value::class
             val metas = metaCache.computeIfAbsent(kClass) { inspectClass(it) }
             if (metas.isEmpty()) {
-                return runCatching { value.toString() }.getOrElse { "<unprintable>" }
+                return runCatching { value.toString() }.getOrElse { unprintable }
             }
             val parts = metas.associate { m ->
                 val v = runCatching { m.getter(value) }.getOrElse { null }
-                val rendered = if (m.sensitive) redactStringKeepingLength(v) else runCatching { v?.toString() ?: "null" }.getOrElse { "<unprintable>" }
+                val rendered = if (m.sensitive) redactStringKeepingLength(v) else runCatching { v?.toString() ?: "null" }.getOrElse { unprintable }
                 m.name to rendered
             }
             parts.entries.joinToString(prefix = "{", postfix = "}") { (k, v) -> "$k=$v" }
         } catch (_: Throwable) {
-            runCatching { value.toString() }.getOrElse { "<unprintable>" }
+            runCatching { value.toString() }.getOrElse { unprintable }
         }
     }
 

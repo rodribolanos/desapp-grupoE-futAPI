@@ -5,8 +5,6 @@ import ar.edu.unq.futapp.model.AdvancedMetric
 import ar.edu.unq.futapp.model.ProcessStatus
 import ar.edu.unq.futapp.service.TaskService
 import ar.edu.unq.futapp.service.TeamService
-import ar.edu.unq.futapp.service.impl.TaskServiceImpl
-import ar.edu.unq.futapp.service.impl.TeamServiceImpl
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
