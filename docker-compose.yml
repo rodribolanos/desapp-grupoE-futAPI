@@ -29,6 +29,12 @@ services:
     depends_on:
       selenium:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
     networks:
       - monitor-net
 
@@ -36,15 +42,24 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     ports:
-      - "9090:9090" # Puerto para acceder a la UI de Prometheus
+      - "9090:9090"
     volumes:
-      # Monta el archivo de configuración local en el path interno de Prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus-entrypoint.sh:/prometheus-entrypoint.sh
+    environment:
+      - FUTAPP_TARGET=futapp:8080
+      - PROMETHEUS_TARGET=localhost:9090
+      - SCRAPE_INTERVAL=15s
+      - FUTAPP_SCRAPE_INTERVAL=5s
+      - METRICS_PATH=/actuator/prometheus
+    entrypoint: ["/bin/sh", "/prometheus-entrypoint.sh"]
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
+    depends_on:
+      futapp:
+        condition: service_healthy
     networks:
-      - monitor-net # Debe estar en la misma red que futapp
+      - monitor-net
 
 networks:
   monitor-net:
