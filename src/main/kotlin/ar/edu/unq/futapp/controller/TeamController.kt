@@ -1,6 +1,7 @@
 package ar.edu.unq.futapp.controller
 
 import ar.edu.unq.futapp.dto.*
+import ar.edu.unq.futapp.model.AdvancedMetric
 import ar.edu.unq.futapp.model.ProcessStatus
 import ar.edu.unq.futapp.service.TaskService
 import ar.edu.unq.futapp.service.TeamService
@@ -100,6 +101,42 @@ class TeamController {
     }
 
 
+    @Operation(summary = "Get advanced metrics for a team in a country",
+        description = "Returns advanced statistics for the specified team within the specified country.",
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved advanced metrics",
+                content = [Content(schema = Schema(implementation = AdvancedMetric::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Team or country not found",
+                content = [Content(schema = Schema(implementation = ExceptionDTO::class))]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Parsing exception",
+              content = [Content(schema = Schema(implementation = ExceptionDTO::class))]
+            )
+        ]
+    )
+    @GetMapping("/{country}/{teamName}/statistics")
+    fun advancedMetricsForTeamInCountry(
+        @PathVariable("country")
+        @NotBlank(message = "country must not be empty or null")
+        country: String,
+        @PathVariable("teamName")
+        @NotBlank(message = "teamName must not be empty or null")
+        teamName: String
+    ): ResponseEntity<AdvancedMetricDTO> {
+        val stats = teamService.getAdvancedMetricsForTeamAndCountry(teamName, country)
+        return ResponseEntity.ok(stats.toDTO())
+    }
+    
     @Operation(summary = "Get comparison process status",
         description = "Returns the status of a team comparison process by its ID.",
         security = [SecurityRequirement(name = "bearerAuth")]
@@ -123,6 +160,7 @@ class TeamController {
             )
         ]
     )
+ 
     @GetMapping("/compare/{id}/status")
     fun getCompareStatus(
         @PathVariable("id")
