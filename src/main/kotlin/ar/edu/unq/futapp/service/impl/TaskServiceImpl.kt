@@ -26,6 +26,7 @@ class TaskServiceImpl(
     private val selfProxy: ObjectProvider<TaskService>
 ):TaskService {
     val RETENTION_DURATION: Duration = Duration.ofHours(12)
+    private val MAX_ERROR_MESSAGE_LENGTH = 255
 
     override fun startTeamComparisonTask(team1: String, team2: String): ProcessStatus {
         val taskId = UUID.randomUUID().toString()
@@ -60,8 +61,9 @@ class TaskServiceImpl(
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun handleComparisonFailure(currentStatus: ProcessStatus, exception: Exception) {
+        val errorMessage = exception.message ?: "Unknown error"
         currentStatus.status = Status.FAILED
-        currentStatus.errorMessage = exception.message ?: "Unknown error"
+        currentStatus.errorMessage = errorMessage.take(MAX_ERROR_MESSAGE_LENGTH)
         processRepository.save(currentStatus)
     }
 
