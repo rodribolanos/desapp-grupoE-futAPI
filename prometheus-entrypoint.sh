@@ -52,3 +52,4 @@ cat /etc/prometheus/prometheus.yml
 
 # Iniciar Prometheus con los argumentos originales
 exec /bin/prometheus "$@"
+
