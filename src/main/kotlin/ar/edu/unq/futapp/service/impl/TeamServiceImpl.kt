@@ -4,6 +4,7 @@ import ar.edu.unq.futapp.events.UpdateTeamEvent
 import ar.edu.unq.futapp.exception.EntityNotFound
 import ar.edu.unq.futapp.model.*
 import ar.edu.unq.futapp.repository.TeamRepository
+import ar.edu.unq.futapp.service.FootballApiClient
 import ar.edu.unq.futapp.service.WhoScoredApiClient
 import ar.edu.unq.futapp.service.TeamService
 import jakarta.transaction.Transactional
@@ -16,7 +17,8 @@ import java.util.Optional
 class TeamServiceImpl @Autowired constructor(
     val teamApiClient: WhoScoredApiClient,
     val teamRepository: TeamRepository,
-    val eventPublisher: ApplicationEventPublisher
+    val eventPublisher: ApplicationEventPublisher,
+    val footballApiClient: FootballApiClient
 ) : TeamService {
     @Transactional
     override fun findPlayersByTeam(teamName: String): List<Player> {
@@ -39,7 +41,13 @@ class TeamServiceImpl @Autowired constructor(
         return matchesOpt.get()
     }
 
-    override fun compareTeams(team1: String, team2: String): TeamComparisonResult {
+    override fun getAdvancedMetricsForTeamAndCountry(teamName: String, country: String): AdvancedMetric {
+        val teamId = footballApiClient.getIdForTeam(teamName)
+        val leagueId = footballApiClient.getIdForCountryLeague(country)
+        return footballApiClient.getAdvancedMetricsForTeamAndCountry(teamId, leagueId)
+    }
+    
+  override fun compareTeams(team1: String, team2: String): TeamComparisonResult {
         val team1Stats: TeamMetrics = teamApiClient.findTeamMetrics(team1)
         val team2Stats: TeamMetrics = teamApiClient.findTeamMetrics(team2)
 
