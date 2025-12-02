@@ -103,6 +103,8 @@ class TeamController {
 
     @Operation(summary = "Get advanced metrics for a team in a country",
         description = "Returns advanced statistics for the specified team within the specified country.",
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
     @ApiResponses(
         value = [
             ApiResponse(

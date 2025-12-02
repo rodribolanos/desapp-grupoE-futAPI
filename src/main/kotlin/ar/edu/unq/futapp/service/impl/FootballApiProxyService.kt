@@ -1,9 +1,9 @@
 package ar.edu.unq.futapp.service.impl
 
-import ar.edu.unq.futapp.dto.footballAPI.*
 import ar.edu.unq.futapp.exception.EntityNotFound
 import ar.edu.unq.futapp.model.AdvancedMetric
 import ar.edu.unq.futapp.service.FootballApiClient
+import ar.edu.unq.futapp.service.footballApiResponse.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity

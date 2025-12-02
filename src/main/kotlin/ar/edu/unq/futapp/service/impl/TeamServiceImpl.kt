@@ -2,10 +2,7 @@ package ar.edu.unq.futapp.service.impl
 
 import ar.edu.unq.futapp.events.UpdateTeamEvent
 import ar.edu.unq.futapp.exception.EntityNotFound
-import ar.edu.unq.futapp.model.AdvancedMetric
-import ar.edu.unq.futapp.model.Player
-import ar.edu.unq.futapp.model.Team
-import ar.edu.unq.futapp.model.UpcomingMatch
+import ar.edu.unq.futapp.model.*
 import ar.edu.unq.futapp.repository.TeamRepository
 import ar.edu.unq.futapp.service.FootballApiClient
 import ar.edu.unq.futapp.service.WhoScoredApiClient

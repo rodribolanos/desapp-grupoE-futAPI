@@ -1,4 +1,4 @@
-package ar.edu.unq.futapp.dto.footballAPI
+package ar.edu.unq.futapp.service.footballApiResponse
 
 data class LeagueApiResponse(
     val response: List<LeagueResponseItem>,
