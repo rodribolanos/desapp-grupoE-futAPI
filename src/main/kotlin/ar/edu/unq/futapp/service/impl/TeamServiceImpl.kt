@@ -49,4 +49,16 @@ class TeamServiceImpl @Autowired constructor(
         val leagueId = footballApiClient.getIdForCountryLeague(country)
         return footballApiClient.getAdvancedMetricsForTeamAndCountry(teamId, leagueId)
     }
+    
+  override fun compareTeams(team1: String, team2: String): TeamComparisonResult {
+        val team1Stats: TeamMetrics = teamApiClient.findTeamMetrics(team1)
+        val team2Stats: TeamMetrics = teamApiClient.findTeamMetrics(team2)
+
+        val comparison = TeamComparisonResult(
+            team1 = team1Stats.teamName,
+            team2 = team2Stats.teamName,
+            comparisonData = team1Stats.compareTo(team2Stats)
+        )
+        return comparison
+    }
 }

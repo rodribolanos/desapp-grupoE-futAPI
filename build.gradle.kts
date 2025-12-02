@@ -21,6 +21,9 @@ configurations {
 	compileOnly {
 		extendsFrom(configurations.annotationProcessor.get())
 	}
+	all {
+		exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+	}
 }
 
 springBoot {
@@ -36,6 +39,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-log4j2")
     implementation("org.hibernate.validator:hibernate-validator:8.0.1.Final")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -57,9 +61,9 @@ dependencies {
     testImplementation("io.mockk:mockk:1.14.5")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
 	testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
-	implementation("org.springframework.boot:spring-boot-starter-actuator:3.5.7")
+	testImplementation("com.tngtech.archunit:archunit:1.4.1")
+    implementation("org.springframework.boot:spring-boot-starter-actuator:3.5.7")
 	implementation("io.micrometer:micrometer-registry-prometheus")
-
 }
 
 kotlin {

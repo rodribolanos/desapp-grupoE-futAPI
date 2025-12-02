@@ -8,4 +8,5 @@ interface WhoScoredApiClient {
     fun findPlayerPerformance(playerName: String): Optional<PlayerPerformance>
     fun findUpcomingFixtures(teamName: String): Optional<List<UpcomingMatch>>
     fun findLastMatchesFromTeam(teamName: String): TeamMatches
+    fun findTeamMetrics(team: String): TeamMetrics
 }
