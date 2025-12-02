@@ -1,6 +1,6 @@
 scrape_configs:
   - job_name: desapp-grupoe-futapi
-    metrics_path: /metrics
+    metrics_path: /actuator/prometheus
     static_configs:
       - targets: ["desapp-grupoe-futapi-production.up.railway.app"]
     scrape_interval: 15s
