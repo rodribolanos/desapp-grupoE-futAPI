@@ -14,6 +14,8 @@ services:
       timeout: 5s
       retries: 30
       start_period: 10s
+    networks:
+      - monitor-net
 
   futapp:
     build:
@@ -27,4 +29,38 @@ services:
     depends_on:
       selenium:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    networks:
+      - monitor-net
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus-entrypoint.sh:/prometheus-entrypoint.sh
+    environment:
+      - FUTAPP_TARGET=futapp:8080
+      - PROMETHEUS_TARGET=localhost:9090
+      - SCRAPE_INTERVAL=15s
+      - FUTAPP_SCRAPE_INTERVAL=5s
+      - METRICS_PATH=/actuator/prometheus
+    entrypoint: ["/bin/sh", "/prometheus-entrypoint.sh"]
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    depends_on:
+      futapp:
+        condition: service_healthy
+    networks:
+      - monitor-net
+
+networks:
+  monitor-net:
+    driver: bridge
