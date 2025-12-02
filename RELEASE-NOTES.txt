@@ -7,3 +7,10 @@ NEW FEATURES:
 
 NOTES:
 - The match prediction is based on an analysis of recent games, assigning probabilities to each team based on home-field advantage, current form, and on-field performance.
+
+
+TAG #3.0.0
+NEW FEATURES:
+- Endpoint for direct statistical comparison between two teams.
+- New endpoints to start, check, and delete background processes.
+- Implementation of asynchronous processes for advanced metrics calculations.
