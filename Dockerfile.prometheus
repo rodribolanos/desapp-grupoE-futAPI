@@ -1,0 +1,11 @@
+FROM prom/prometheus:latest
+
+# Copiamos nuestra config
+COPY prometheus.yml /etc/prometheus/prometheus.yml
+
+# Exponemos el puerto por el cual Railway va a servir Prometheus
+EXPOSE 9090
+
+# Railway exige que el proceso quede corriendo en foreground (Prometheus ya lo hace)
+# Ejecutamos como root para evitar problemas con volúmenes
+USER root
