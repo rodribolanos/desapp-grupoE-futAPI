@@ -1,0 +1,9 @@
+TAG #2.0.0
+NEW FEATURES:
+- Endpoint for a team's upcoming matches
+- Endpoint for query history
+- Endpoint for player performance
+- Endpoint for match prediction
+
+NOTES:
+- The match prediction is based on an analysis of recent games, assigning probabilities to each team based on home-field advantage, current form, and on-field performance.
